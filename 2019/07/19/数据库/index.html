@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html  lang="en">
+<head>
+    <meta charset="utf-8" />
+
+<meta name="generator" content="Hexo 3.9.0" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+<title>数据库 - Blog</title>
+
+
+    <meta name="description" content="数据库架构如何设计一个关系型数据库首先将其划分为存储部分和对存储进行逻辑管理的程序实例，存储部分类似一个文件系统，程序实例将包含数据逻辑关系转为物理存储关系的存储管理模块，优化存储效率的缓存模块，将sql语句进行解析的sql解析模块，记录操作的日志管理模块，进行多用户管理的权限划分模块，容灾模块，优化数据查询的索引模块，使数据库支持并发的锁模块。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据库">
+<meta property="og:url" content="https://sanwanliu.github.io/2019/07/19/数据库/index.html">
+<meta property="og:site_name" content="Blog">
+<meta property="og:description" content="数据库架构如何设计一个关系型数据库首先将其划分为存储部分和对存储进行逻辑管理的程序实例，存储部分类似一个文件系统，程序实例将包含数据逻辑关系转为物理存储关系的存储管理模块，优化存储效率的缓存模块，将sql语句进行解析的sql解析模块，记录操作的日志管理模块，进行多用户管理的权限划分模块，容灾模块，优化数据查询的索引模块，使数据库支持并发的锁模块。">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://sanwanliu.github.io/images/og_image.png">
+<meta property="og:updated_time" content="2019-09-14T18:13:01.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="数据库">
+<meta name="twitter:description" content="数据库架构如何设计一个关系型数据库首先将其划分为存储部分和对存储进行逻辑管理的程序实例，存储部分类似一个文件系统，程序实例将包含数据逻辑关系转为物理存储关系的存储管理模块，优化存储效率的缓存模块，将sql语句进行解析的sql解析模块，记录操作的日志管理模块，进行多用户管理的权限划分模块，容灾模块，优化数据查询的索引模块，使数据库支持并发的锁模块。">
+<meta name="twitter:image" content="https://sanwanliu.github.io/images/og_image.png">
+
+
+
+
+
+
+
+<link rel="icon" href="/images/favicon.ico">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.7.2/css/bulma.css">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu:400,600|Source+Code+Pro">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.12.0/styles/atom-one-light.css">
+
+
+    
+    
+    
+    <style>body>.footer,body>.navbar,body>.section{opacity:0}</style>
+    
+
+    
+    
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/css/lightgallery.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/css/justifiedGallery.min.css">
+    
+
+    
+    
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/outdatedbrowser@1.1.5/outdatedbrowser/outdatedbrowser.min.css">
+
+
+    
+    
+    
+    
+
+<link rel="stylesheet" href="/css/back-to-top.css">
+
+
+    
+    
+
+    
+    
+    
+    
+
+    
+    
+<link rel="stylesheet" href="/css/progressbar.css">
+<script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script>
+
+    
+    
+    
+
+
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="is-2-column">
+    <nav class="navbar navbar-main">
+    <div class="container">
+        <div class="navbar-brand is-flex-center">
+            <a class="navbar-item navbar-logo" href="/">
+            
+                <img src="/images/logo.svg" alt="数据库" height="28">
+            
+            </a>
+        </div>
+        <div class="navbar-menu">
+            
+            <div class="navbar-start">
+                
+                <a class="navbar-item"
+                href="/">Home</a>
+                
+                <a class="navbar-item"
+                href="/archives">Archives</a>
+                
+                <a class="navbar-item"
+                href="/categories">Categories</a>
+                
+                <a class="navbar-item"
+                href="/tags">Tags</a>
+                
+            </div>
+            
+            <div class="navbar-end">
+                
+                
+                
+                <a class="navbar-item search" title="Search" href="javascript:;">
+                    <i class="fas fa-search"></i>
+                </a>
+                
+            </div>
+        </div>
+    </div>
+</nav>
+    
+    <section class="section">
+        <div class="container">
+            <div class="columns">
+                <div class="column is-8-tablet is-8-desktop is-8-widescreen has-order-2 column-main"><div class="card">
+    
+    <div class="card-content article ">
+        
+        <div class="level article-meta is-size-7 is-uppercase is-mobile is-overflow-x-auto">
+            <div class="level-left">
+                <time class="level-item has-text-grey" datetime="2019-07-19T01:12:43.000Z">2019-07-19</time>
+                
+                <div class="level-item">
+                <a class="has-link-grey -link" href="/categories/总结/">总结</a>
+                </div>
+                
+                
+                <span class="level-item has-text-grey">
+                    
+                    
+                    18 minutes read (About 2761 words)
+                </span>
+                
+                
+            </div>
+        </div>
+        
+        <h1 class="title is-size-3 is-size-4-mobile has-text-weight-normal">
+            
+                数据库
+            
+        </h1>
+        <div class="content">
+            <h1 id="数据库架构"><a href="#数据库架构" class="headerlink" title="数据库架构"></a>数据库架构</h1><h2 id="如何设计一个关系型数据库"><a href="#如何设计一个关系型数据库" class="headerlink" title="如何设计一个关系型数据库"></a>如何设计一个关系型数据库</h2><p>首先将其划分为存储部分和对存储进行逻辑管理的程序实例，存储部分类似一个文件系统，程序实例将包含数据逻辑关系转为物理存储关系的存储管理模块，优化存储效率的缓存模块，将sql语句进行解析的sql解析模块，记录操作的日志管理模块，进行多用户管理的权限划分模块，容灾模块，优化数据查询的索引模块，使数据库支持并发的锁模块。</p>
+<a id="more"></a>
+<h1 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h1><h2 id="为什么使用索引"><a href="#为什么使用索引" class="headerlink" title="为什么使用索引"></a>为什么使用索引</h2><p>当查询大量数据，如果进行全表扫描，查询非常慢，所以需要更高效的机制来避免全表扫描。</p>
+<h2 id="什么样的信息能成为索引"><a href="#什么样的信息能成为索引" class="headerlink" title="什么样的信息能成为索引"></a>什么样的信息能成为索引</h2><p>主键，唯一键，普通键等能让数据具备区分性</p>
+<h2 id="索引的数据结构"><a href="#索引的数据结构" class="headerlink" title="索引的数据结构"></a>索引的数据结构</h2><p>主流是B+树，还有hash结构和BitMap，其中Mysql不支持BitMap，基于innodb和mysm引擎的mysql不显示支持hash</p>
+<ul>
+<li>二叉查找树O(logn)</li>
+</ul>
+<p><img src="http://img.usopp.online/markdown-img-paste-20190714140115985.png" alt></p>
+<p>缺点：插入数据有可能变为线性二叉树-》树旋转 检索深度每增加1，就会发生一次io，检索性能降低。-》要使树变得矮一些，每个节点数据存储多一些，</p>
+<ul>
+<li>B树O(logn)</li>
+</ul>
+<p><img src="http://img.usopp.online/markdown-img-paste-20190714141404769.png" alt></p>
+<p><img src="http://img.usopp.online/markdown-img-paste-20190714141346753.png" alt></p>
+<p><img src="http://img.usopp.online/markdown-img-paste-20190714141915279.png" alt></p>
+<p>说明：前四条规则用来限制孩子数，最后一条规则限制节点关键字数量及大小。通过合并，分裂，上移下移来使树不变成线性</p>
+<ul>
+<li>B+树O(logn)-主流</li>
+</ul>
+<p><img src="http://img.usopp.online/markdown-img-paste-20190714145727999.png" alt></p>
+<p><img src="http://img.usopp.online/markdown-img-paste-20190714145942789.png" alt></p>
+<p>B+树只存索引信息，内部节点比B树更小，储存时，盘块所能容纳的关键字数量更多，一次性读入内存的关键字更多，减少io次数</p>
+<ul>
+<li><p>Hash <img src="http://img.usopp.online/markdown-img-paste-20190714151408980.png" alt></p>
+</li>
+<li><p>BitMap（位图索引）</p>
+</li>
+</ul>
+<h2 id="密集索引和稀疏索引"><a href="#密集索引和稀疏索引" class="headerlink" title="密集索引和稀疏索引"></a>密集索引和稀疏索引</h2><p><img src="http://img.usopp.online/markdown-img-paste-20190714152649923.png" alt></p>
+<p><img src="http://img.usopp.online/markdown-img-paste-20190714153137398.png" alt></p>
+<p><img src="http://img.usopp.online/markdown-img-paste-20190714153639925.png" alt></p>
+<p><img src="http://img.usopp.online/markdown-img-paste-20190714153622236.png" alt></p>
+<p>innodb有且只有一个聚集索引，数据文件和索引绑在一起，必须要有主键，通过主键索引效率很高，但是辅助索引需要查两次。</p>
+<p>myisam是非聚集索引，数据文件是分离的，索引保存的是数据文件的指针，主键索引和辅助索引是独立的，因此myisam适合增删改。</p>
+<h2 id="如何定位并优化慢查询sql"><a href="#如何定位并优化慢查询sql" class="headerlink" title="如何定位并优化慢查询sql"></a>如何定位并优化慢查询sql</h2><ul>
+<li><p>根据慢日志</p>
+</li>
+<li><p>根据explain</p>
+<p><img src="http://img.usopp.online/markdown-img-paste-20190714155752882.png" alt></p>
+<p><img src="http://img.usopp.online/markdown-img-paste-20190714155856947.png" alt></p>
+</li>
+</ul>
+<figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">explain select count(id) from person_info ;</span><br><span class="line"></span><br><span class="line">key-account 不是主键id，原因是密集索引的叶子索引把其他列的数据也存放在叶子节点中，查询效率比稀疏索引低</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>修改sql或者尽量让sql走索引</li>
+</ul>
+<h2 id="联合索引最左原则的成因"><a href="#联合索引最左原则的成因" class="headerlink" title="联合索引最左原则的成因"></a>联合索引最左原则的成因</h2><p>最左匹配原则：</p>
+<ol>
+<li><p>mysql会一直向右匹配直到遇到范围查询就停止匹配，比如a=3 and b=2 and c&gt;3 and d=5，如果建立(a,b,c,d)索引，d是用不到索引的，如果建立的是(a,b,d,c)索引则都可以用到，且a，b，d的顺序是可以任意调整的</p>
+</li>
+<li><p>=和in是可以乱序的</p>
+</li>
+</ol>
+<p>成因：</p>
+<p><img src="http://img.usopp.online/markdown-img-paste-20190714162506974.png" alt></p>
+<p>mysql创建复合索引时，首先对第一个字段进行排序，在第一个字段的基础上，再对第二个字段进行排序，依次类推，所以自能最左匹配</p>
+<h2 id="索引建立的越多越好吗"><a href="#索引建立的越多越好吗" class="headerlink" title="索引建立的越多越好吗"></a>索引建立的越多越好吗</h2><ul>
+<li>数据量小的表不需要索引，建立增加额外开销</li>
+<li>数据变更需要维护索引，更多的索引意味着更多的维护成本</li>
+<li>更多的索引意味着需要更多的空间</li>
+</ul>
+<h1 id="锁"><a href="#锁" class="headerlink" title="锁"></a>锁</h1><h2 id="MyISAM和InnoDB的锁的区别是什么"><a href="#MyISAM和InnoDB的锁的区别是什么" class="headerlink" title="MyISAM和InnoDB的锁的区别是什么"></a>MyISAM和InnoDB的锁的区别是什么</h2><p><img src="http://img.usopp.online/markdown-img-paste-20190714175057287.png" alt></p>
+<p>myisam：</p>
+<p>读写、写读-myisam在进行查询的时候，会加一个表级别的读锁；在进行增删改的时候会加一个表级别的行锁。在读锁未被释放，加写锁时会被阻塞，直到读锁被释放为止。</p>
+<p>读读-可以同时进行，读锁又叫共享锁。（上排他锁，for update）</p>
+<p>写写-不能同时写，写锁又叫排他锁</p>
+<p>innodb：</p>
+<p>二段锁：加锁解锁两个步骤，先对同一个事务里的一批操作做加锁，commit的时候再进行解锁</p>
+<figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">set autocommit=0；// 支持事务，需要关闭事务自动提交</span><br><span class="line">先读后写</span><br><span class="line">session1：select * from person_info where id=1;</span><br><span class="line">session12: update  person_info set title =&quot;test&quot; where id=1;//本来应该阻塞，竟然成功</span><br><span class="line">//实际innodb对select做了改进，并未上读锁</span><br></pre></td></tr></table></figure>
+
+<p>表级锁和索引无关，行级锁和索引有关</p>
+<p>锁的力度越细，代价越高。表级锁只要在表的头部上锁，行级锁需要扫描到某行后对其加锁，开销更大</p>
+<ul>
+<li><p>MyISAM默认用的是表级锁，不支持行级锁</p>
+</li>
+<li><p>InnoDB默认用的是行级锁，也支持表级锁</p>
+</li>
+</ul>
+<h2 id="MyISAM适合的场景"><a href="#MyISAM适合的场景" class="headerlink" title="MyISAM适合的场景"></a>MyISAM适合的场景</h2><ul>
+<li>频繁执行全表count语句</li>
+<li>对数据的增删改的频率不高 shiwu，查询频繁</li>
+<li>没有事务</li>
+</ul>
+<h2 id="InnoDB适合的场景"><a href="#InnoDB适合的场景" class="headerlink" title="InnoDB适合的场景"></a>InnoDB适合的场景</h2><ul>
+<li>增删改查频繁</li>
+<li>需要事务</li>
+</ul>
+<h2 id="数据库锁的分类"><a href="#数据库锁的分类" class="headerlink" title="数据库锁的分类"></a>数据库锁的分类</h2><p><img src="http://img.usopp.online/markdown-img-paste-2019071518124027.png" alt>、</p>
+<ul>
+<li><p>悲观锁：对数据被外界修改持保守态度，在数据处理过程将数据锁定，依靠数据库提供的锁机制实现。缺点：增加开销，降低并行性</p>
+</li>
+<li><p>乐观锁：认为数据一般情况下不会冲突，到数据提交更新时才检查是否冲突，通过版本号和时间戳实现</p>
+</li>
+</ul>
+<p>有一条比较好的建议，可以减小乐观锁力度，最大程度的提升吞吐率，提高并发能力！如下：</p>
+<figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">//修改商品库存</span><br><span class="line">update item set quantity=quantity - 1 where id = 1 and quantity - 1 &gt; 0</span><br></pre></td></tr></table></figure>
+
+<h2 id="事务的四大特性"><a href="#事务的四大特性" class="headerlink" title="事务的四大特性"></a>事务的四大特性</h2><p><img src="http://img.usopp.online/markdown-img-paste-20190715201933456.png" alt></p>
+<p>原子性:事务包含的全部操作要么全部执行要么全部不执行 一致性:事务要确保数据库的状态从一个一致的状态转为另一个一致的状态(转帐) 隔离性:多个事务并发执行时,一个事务的执行不应该影响其他事务 持久性:一个事务的提交,他对数据库的修改 应该永久地保存在数据库中</p>
+<h2 id="事务的隔离级别以及各级别下的并发访问问题"><a href="#事务的隔离级别以及各级别下的并发访问问题" class="headerlink" title="事务的隔离级别以及各级别下的并发访问问题"></a>事务的隔离级别以及各级别下的并发访问问题</h2><figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select @@tx_isolation</span><br></pre></td></tr></table></figure>
+
+<p>事务并发访问引起的问题以及如何避免</p>
+<ul>
+<li>更新丢失-mysql所有事务隔离级别在数据库层面上均可避免</li>
+</ul>
+<p><img src="http://img.usopp.online/markdown-img-paste-20190715202429276.png" alt></p>
+<ul>
+<li>脏读（读未提交）-解决：将隔离级别设置为读已提交read-committed就可避免</li>
+</ul>
+<figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">set session transaction isolation level read uncommitted;//读未提交</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>不可重复读-解决：将隔离级别设置为可重复读repeatable-read</li>
+</ul>
+<figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">session1 一直查询，余额为1300</span><br><span class="line">session2 update balance=300，未提交</span><br><span class="line">session1 查询，余额为1300</span><br><span class="line">session2提交</span><br><span class="line">session1查询变为1600</span><br></pre></td></tr></table></figure>
+
+<p>-幻读（事务a查询若干条数据，事务b插入或修改了事务a的结果集，导致事务a像出现幻觉一样）-解决：将事务隔离级别设置为serializable</p>
+<figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">session a：  select * from account lock in share mode;//查出3条数据</span><br><span class="line"></span><br><span class="line">(rr级别下:无法插入,等待session a 提交,mysql的innodb在rr级别下避免了幻读)</span><br><span class="line">sessionb: insert into account;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">(rc级别下：竟然更新了4条数据)</span><br><span class="line">sesion a: update account set balance =100;</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://img.usopp.online/markdown-img-paste-20190715210805379.png" alt></p>
+<p>出于性能考虑，事务级别越高，降低数据库的并发度越低。 oracle默认读已提交read-committed；mysql的默认为repeatable-read；</p>
+<h2 id="innodb可重复读rr级别如何避免幻读"><a href="#innodb可重复读rr级别如何避免幻读" class="headerlink" title="innodb可重复读rr级别如何避免幻读"></a>innodb可重复读rr级别如何避免幻读</h2><p>表象:快照读(非阻塞读)–伪mvcc 内在:行锁+gap锁</p>
+<h3 id="当前读和快照读"><a href="#当前读和快照读" class="headerlink" title="当前读和快照读"></a>当前读和快照读</h3><p>当前读,加了锁的增删改查,也就是读取最新数据</p>
+<p>快照读用于提升并发性能,基于多版本并发控制及mvcc,mvcc是行级锁的变种,在很多情况下避免了加锁操作,开销更低. 读取的有可能是历史版本(rr级别下,快照读取决快照创建的时机),在serializable下无效</p>
+<p><img src="http://img.usopp.online/markdown-img-paste-20190719111924818.png" alt></p>
+<figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">s1:select * from A where id =2;// balance=1000</span><br><span class="line">s2:update A set balance=600 where id=2;</span><br><span class="line"></span><br><span class="line">rc级别下:</span><br><span class="line">s1:select * from A where id=2;//balance=600;</span><br><span class="line">s1:select * from A where id=2 lock in share mode;//balance=600</span><br><span class="line">rc级别下当前读和快照读读到的数据版本是一样的</span><br><span class="line"></span><br><span class="line">rr级别下:</span><br><span class="line">s1:select * from A where id=2;//balance=1000;</span><br><span class="line">s1:select * from A where id=2 lock in share mode;//balance=600</span><br><span class="line">rr级别下快照读有可能读到数据的历史版本</span><br></pre></td></tr></table></figure>
+
+<h3 id="rc-rr级别下的InnoDB的非阻塞读如何实现"><a href="#rc-rr级别下的InnoDB的非阻塞读如何实现" class="headerlink" title="rc,rr级别下的InnoDB的非阻塞读如何实现"></a>rc,rr级别下的InnoDB的非阻塞读如何实现</h3><p><img src="http://img.usopp.online/markdown-img-paste-20190719135658175.png" alt></p>
+<p>修改过程:先加上排他锁,然后拷贝一份到undo log中</p>
+<p><img src="http://img.usopp.online/markdown-img-paste-20190719135829859.png" alt></p>
+<p>readview决定可见性</p>
+<p>取出的trx_id小于当前活跃事务Id</p>
+<p>rc级别下,每次快照读都会创建一个新的快照 rr级别下,快照读读的是第一次创建的快照</p>
+<h3 id="next-key锁-行锁-gap锁"><a href="#next-key锁-行锁-gap锁" class="headerlink" title="next-key锁(行锁+gap锁)"></a>next-key锁(行锁+gap锁)</h3><p>gap锁,防止同一事务的两次当前读出现幻读,在rr级别以上才有</p>
+<p><img src="http://img.usopp.online/markdown-img-paste-20190719143009929.png" alt></p>
+<h2 id="Gap锁用在非唯一索引或者不走索引的当前读中"><a href="#Gap锁用在非唯一索引或者不走索引的当前读中" class="headerlink" title="Gap锁用在非唯一索引或者不走索引的当前读中"></a>Gap锁用在非唯一索引或者不走索引的当前读中</h2><p><img src="http://img.usopp.online/markdown-img-paste-20190719143314570.png" alt></p>
+<p><img src="http://img.usopp.online/markdown-img-paste-20190719144137894.png" alt></p>
+<h1 id="关键语法"><a href="#关键语法" class="headerlink" title="关键语法"></a>关键语法</h1><h2 id="group-by"><a href="#group-by" class="headerlink" title="group by"></a>group by</h2><ul>
+<li><p>满足:select的列要么是group by的条件要么是统计相关的函数</p>
+</li>
+<li><p>列函数对于group by字句定义的每个组各返回一个结果</p>
+<p><img src="http://img.usopp.online/markdown-img-paste-2019071914584821.png" alt></p>
+</li>
+</ul>
+<figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">#查询所有同学的学号,选课数,总成绩</span><br><span class="line">select student_id,count(course_id),sum(score)</span><br><span class="line">from score</span><br><span class="line">group by student_id</span><br><span class="line"></span><br><span class="line">#查询所有同学的学号,姓名,选课数,总成绩</span><br><span class="line">select s.student_id,t.name,count(course_id),sum(score)</span><br><span class="line">from score s,student t</span><br><span class="line">where s.student_id = t.student_id</span><br><span class="line">group by student_id</span><br></pre></td></tr></table></figure>
+
+<h2 id="having"><a href="#having" class="headerlink" title="having"></a>having</h2><p><img src="http://img.usopp.online/markdown-img-paste-20190719151037402.png" alt></p>
+<figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">#查询平均成绩大于60分的同学的学号和平均成绩</span><br><span class="line">select student_id,avg(score)</span><br><span class="line">from score</span><br><span class="line">group by student_id</span><br><span class="line">having avg(score)&gt;60</span><br><span class="line"></span><br><span class="line">#查询没有学全所有课的同学的学号,姓名</span><br><span class="line">select s.student_id,t.name</span><br><span class="line">from score s,student t</span><br><span class="line">where s.student_id=t.student_id</span><br><span class="line">group by student_id</span><br><span class="line">having count(s.course_id)&lt;(select count(*) from course group by course_id)</span><br></pre></td></tr></table></figure>
+
+<h2 id="统计相关-count-sum-max-min-avg"><a href="#统计相关-count-sum-max-min-avg" class="headerlink" title="统计相关:count,sum,max,min,avg"></a>统计相关:count,sum,max,min,avg</h2><p>#</p>
+
+        </div>
+        
+        
+        
+        <div class="social-share" data-sites="wechat,qq,weibo,douban,twitter,facebook"></div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js@1.0.16/dist/css/share.min.css">
+<script src="https://cdn.jsdelivr.net/npm/social-share.js@1.0.16/dist/js/social-share.min.js"></script>
+
+        
+    </div>
+</div>
+
+
+
+
+
+<div class="card card-transparent">
+    <div class="level post-navigation is-flex-wrap is-mobile">
+        
+        <div class="level-start">
+            <a class="level level-item has-link-grey  article-nav-prev" href="/2019/07/19/18-验证二叉搜索树:leetcode-98/">
+                <i class="level-item fas fa-chevron-left"></i>
+                <span class="level-item">18.验证二叉搜索树:leetcode-98 Search Tree</span>
+            </a>
+        </div>
+        
+        
+        <div class="level-end">
+            <a class="level level-item has-link-grey  article-nav-next" href="/2019/07/19/网络/">
+                <span class="level-item">网络</span>
+                <i class="level-item fas fa-chevron-right"></i>
+            </a>
+        </div>
+        
+    </div>
+</div>
+
+
+
+<div class="card">
+    <div class="card-content">
+        <h3 class="title is-5 has-text-weight-normal">Comments</h3>
+        
+<div id="comment-container"></div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.4.1/dist/gitalk.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1.4.1/dist/gitalk.min.js"></script>
+<script>
+    var gitalk = new Gitalk({
+        clientID: '0c679442f41c98e22358',
+        clientSecret: '2d72f47a5ab373f666cf58e7ef87882eff5dfffb',
+        id: 'b9b27d1efaaf7a093a3128c45ced23c1',
+        repo: 'sanwanliu.github.io',
+        owner: 'sanwanliu',
+        admin: "sanwanliu",
+        createIssueManually: false,
+        distractionFreeMode: false
+    })
+    gitalk.render('comment-container')
+</script>
+
+    </div>
+</div>
+</div>
+                
+                
+
+
+
+
+<div class="column is-4-tablet is-4-desktop is-4-widescreen  has-order-3 column-right ">
+    
+        
+<div class="card widget">
+    <div class="card-content">
+        <nav class="level">
+            <div class="level-item has-text-centered" style="flex-shrink: 1">
+                <div>
+                    
+                    <figure class="image is-128x128 has-mb-6">
+                        <img class=is-rounded src="/images/avatar.png" alt="sanwanliu">
+                    </figure>
+                    
+                    <p class="is-size-4 is-block">
+                        sanwanliu
+                    </p>
+                    
+                    
+                    
+                </div>
+            </div>
+        </nav>
+        <nav class="level is-mobile">
+            <div class="level-item has-text-centered is-marginless">
+                <div>
+                    <p class="heading">
+                        Posts
+                    </p>
+                    <p class="title has-text-weight-normal">
+                        31
+                    </p>
+                </div>
+            </div>
+            <div class="level-item has-text-centered is-marginless">
+                <div>
+                    <p class="heading">
+                        Categories
+                    </p>
+                    <p class="title has-text-weight-normal">
+                        6
+                    </p>
+                </div>
+            </div>
+            <div class="level-item has-text-centered is-marginless">
+                <div>
+                    <p class="heading">
+                        Tags
+                    </p>
+                    <p class="title has-text-weight-normal">
+                        14
+                    </p>
+                </div>
+            </div>
+        </nav>
+        <div class="level">
+            <a class="level-item button is-link is-rounded" href="https://github.com/sanwanliu" target="_blank">
+                Follow</a>
+        </div>
+        
+        
+    </div>
+</div>
+    
+        
+    
+        
+<div class="card widget">
+    <div class="card-content">
+        <h3 class="menu-label">
+            Tag Cloud
+        </h3>
+        <a href="/tags/BST/" style="font-size: 10px;">BST</a> <a href="/tags/array/" style="font-size: 10px;">array</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/map/" style="font-size: 13.33px;">map</a> <a href="/tags/notbest/" style="font-size: 10px;">notbest</a> <a href="/tags/priorityQueue/" style="font-size: 10px;">priorityQueue</a> <a href="/tags/priorityQueue-dequeue-queue/" style="font-size: 10px;">priorityQueue dequeue queue</a> <a href="/tags/queue/" style="font-size: 13.33px;">queue</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/stack/" style="font-size: 10px;">stack</a> <a href="/tags/tree/" style="font-size: 20px;">tree</a> <a href="/tags/two-pointers/" style="font-size: 10px;">two-pointers</a> <a href="/tags/栈/" style="font-size: 10px;">栈</a> <a href="/tags/链表/" style="font-size: 16.67px;">链表</a>
+    </div>
+</div>
+
+    
+        
+<div class="card widget">
+    <div class="card-content">
+        <h3 class="menu-label">
+            Recent
+        </h3>
+        
+        <article class="media">
+            
+            <a href="/2019/09/05/21-递归和分治/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/images/thumbnail.svg" alt="21.递归和分治">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-09-05T08:13:55.000Z">2019-09-05</time></div>
+                    <a href="/2019/09/05/21-递归和分治/" class="title has-link-black-ter is-size-6 has-text-weight-normal">21.递归和分治</a>
+                    <p class="is-size-7 is-uppercase">
+                        
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2019/08/13/Java常用类库/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/images/thumbnail.svg" alt="Java常用类库">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-08-13T11:17:42.000Z">2019-08-13</time></div>
+                    <a href="/2019/08/13/Java常用类库/" class="title has-link-black-ter is-size-6 has-text-weight-normal">Java常用类库</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/java/">java</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2019/08/13/Java框架-Spring/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/images/thumbnail.svg" alt="Java框架-Spring">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-08-13T07:25:45.000Z">2019-08-13</time></div>
+                    <a href="/2019/08/13/Java框架-Spring/" class="title has-link-black-ter is-size-6 has-text-weight-normal">Java框架-Spring</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/java/">java</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2019/07/26/Java多线程和并发-原理/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/images/thumbnail.svg" alt="Java多线程和并发-原理">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-07-26T07:38:23.000Z">2019-07-26</time></div>
+                    <a href="/2019/07/26/Java多线程和并发-原理/" class="title has-link-black-ter is-size-6 has-text-weight-normal">Java多线程和并发-原理</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/java/">java</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2019/07/24/Java多线程和并发/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/images/thumbnail.svg" alt="Java多线程和并发">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-07-24T11:31:45.000Z">2019-07-24</time></div>
+                    <a href="/2019/07/24/Java多线程和并发/" class="title has-link-black-ter is-size-6 has-text-weight-normal">Java多线程和并发</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/java/">java</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+    </div>
+</div>
+
+    
+        <div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+        <h3 class="menu-label">
+            Archives
+        </h3>
+        <ul class="menu-list">
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2019/09/">
+                <span class="level-start">
+                    <span class="level-item">September 2019</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">1</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2019/08/">
+                <span class="level-start">
+                    <span class="level-item">August 2019</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">2</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2019/07/">
+                <span class="level-start">
+                    <span class="level-item">July 2019</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">28</span>
+                </span>
+            </a>
+        </li>
+        
+        </ul>
+        </div>
+    </div>
+</div>
+    
+        <div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+            <h3 class="menu-label">
+                Tags
+            </h3>
+            <div class="field is-grouped is-grouped-multiline">
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/BST/">
+                        <span class="tag">BST</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/array/">
+                        <span class="tag">array</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/linux/">
+                        <span class="tag">linux</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/map/">
+                        <span class="tag">map</span>
+                        <span class="tag is-grey">2</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/notbest/">
+                        <span class="tag">notbest</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/priorityQueue/">
+                        <span class="tag">priorityQueue</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/priorityQueue-dequeue-queue/">
+                        <span class="tag">priorityQueue dequeue queue</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/queue/">
+                        <span class="tag">queue</span>
+                        <span class="tag is-grey">2</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/redis/">
+                        <span class="tag">redis</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/stack/">
+                        <span class="tag">stack</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/tree/">
+                        <span class="tag">tree</span>
+                        <span class="tag is-grey">4</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/two-pointers/">
+                        <span class="tag">two-pointers</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/栈/">
+                        <span class="tag">栈</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/链表/">
+                        <span class="tag">链表</span>
+                        <span class="tag is-grey">3</span>
+                    </a>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+    
+    
+</div>
+
+            </div>
+        </div>
+    </section>
+    <footer class="footer">
+    <div class="container">
+        <div class="level">
+            <div class="level-start has-text-centered-mobile">
+                <p class="is-size-7">
+                &copy; 2019 sanwanliu&nbsp;
+                Powered by <a href="https://hexo.io/" target="_blank">Hexo</a> & <a
+                        href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank">Icarus</a>
+                
+                </p>
+            </div>
+            <div class="level-end">
+            
+                <div class="field has-addons is-flex-center-mobile has-mt-5-mobile is-flex-wrap is-flex-middle">
+                
+                
+                <p class="control">
+                    <a class="button is-white is-large" target="_blank" title="Creative Commons" href="https://creativecommons.org/">
+                        
+                        <i class="fab fa-creative-commons"></i>
+                        
+                    </a>
+                </p>
+                
+                <p class="control">
+                    <a class="button is-white is-large" target="_blank" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/">
+                        
+                        <i class="fab fa-creative-commons-by"></i>
+                        
+                    </a>
+                </p>
+                
+                </div>
+            
+            </div>
+        </div>
+    </div>
+</footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script>
+<script>moment.locale("en");</script>
+
+<script>
+var IcarusThemeSettings = {
+    article: {
+        highlight: {
+            clipboard: true,
+            fold: 'unfolded'
+        }
+    }
+};
+</script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script>
+
+
+
+    
+    
+    
+    <script src="/js/animation.js"></script>
+    
+
+    
+    
+    
+    <script src="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/js/lightgallery.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js" defer></script>
+    <script src="/js/gallery.js" defer></script>
+    
+
+    
+    
+
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update
+            my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/outdatedbrowser@1.1.5/outdatedbrowser/outdatedbrowser.min.js" defer></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        });
+    });
+</script>
+
+
+    
+    
+<script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/unpacked/MathJax.js?config=TeX-MML-AM_CHTML" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    MathJax.Hub.Config({
+        'HTML-CSS': {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+});
+</script>
+
+    
+    
+
+<a id="back-to-top" title="Back to Top" href="javascript:;">
+    <i class="fas fa-chevron-up"></i>
+</a>
+<script src="/js/back-to-top.js" defer></script>
+
+
+    
+    
+
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+
+
+<script src="/js/main.js" defer></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something..." />
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js" defer></script>
+<link rel="stylesheet" href="/css/search.css">
+<link rel="stylesheet" href="/css/insight.css">
+    
+</body>
+</html>

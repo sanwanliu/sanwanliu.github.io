@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html  lang="en">
+<head>
+    <meta charset="utf-8" />
+
+<meta name="generator" content="Hexo 3.9.0" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+<title>Java底层:JVM - Blog</title>
+
+
+    <meta name="description" content="谈谈你对java的理解 平台无关性 GC 语言特性 面向对象 类库 异常处理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java底层:JVM">
+<meta property="og:url" content="https://sanwanliu.github.io/2019/07/23/Java底层-jvm/index.html">
+<meta property="og:site_name" content="Blog">
+<meta property="og:description" content="谈谈你对java的理解 平台无关性 GC 语言特性 面向对象 类库 异常处理">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://sanwanliu.github.io/images/og_image.png">
+<meta property="og:updated_time" content="2019-09-14T18:13:01.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java底层:JVM">
+<meta name="twitter:description" content="谈谈你对java的理解 平台无关性 GC 语言特性 面向对象 类库 异常处理">
+<meta name="twitter:image" content="https://sanwanliu.github.io/images/og_image.png">
+
+
+
+
+
+
+
+<link rel="icon" href="/images/favicon.ico">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.7.2/css/bulma.css">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu:400,600|Source+Code+Pro">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.12.0/styles/atom-one-light.css">
+
+
+    
+    
+    
+    <style>body>.footer,body>.navbar,body>.section{opacity:0}</style>
+    
+
+    
+    
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/css/lightgallery.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/css/justifiedGallery.min.css">
+    
+
+    
+    
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/outdatedbrowser@1.1.5/outdatedbrowser/outdatedbrowser.min.css">
+
+
+    
+    
+    
+    
+
+<link rel="stylesheet" href="/css/back-to-top.css">
+
+
+    
+    
+
+    
+    
+    
+    
+
+    
+    
+<link rel="stylesheet" href="/css/progressbar.css">
+<script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script>
+
+    
+    
+    
+
+
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="is-2-column">
+    <nav class="navbar navbar-main">
+    <div class="container">
+        <div class="navbar-brand is-flex-center">
+            <a class="navbar-item navbar-logo" href="/">
+            
+                <img src="/images/logo.svg" alt="Java底层:JVM" height="28">
+            
+            </a>
+        </div>
+        <div class="navbar-menu">
+            
+            <div class="navbar-start">
+                
+                <a class="navbar-item"
+                href="/">Home</a>
+                
+                <a class="navbar-item"
+                href="/archives">Archives</a>
+                
+                <a class="navbar-item"
+                href="/categories">Categories</a>
+                
+                <a class="navbar-item"
+                href="/tags">Tags</a>
+                
+            </div>
+            
+            <div class="navbar-end">
+                
+                
+                
+                <a class="navbar-item search" title="Search" href="javascript:;">
+                    <i class="fas fa-search"></i>
+                </a>
+                
+            </div>
+        </div>
+    </div>
+</nav>
+    
+    <section class="section">
+        <div class="container">
+            <div class="columns">
+                <div class="column is-8-tablet is-8-desktop is-8-widescreen has-order-2 column-main"><div class="card">
+    
+    <div class="card-content article ">
+        
+        <div class="level article-meta is-size-7 is-uppercase is-mobile is-overflow-x-auto">
+            <div class="level-left">
+                <time class="level-item has-text-grey" datetime="2019-07-23T07:46:47.000Z">2019-07-23</time>
+                
+                <div class="level-item">
+                <a class="has-link-grey -link" href="/categories/java/">java</a>
+                </div>
+                
+                
+                <span class="level-item has-text-grey">
+                    
+                    
+                    10 minutes read (About 1527 words)
+                </span>
+                
+                
+            </div>
+        </div>
+        
+        <h1 class="title is-size-3 is-size-4-mobile has-text-weight-normal">
+            
+                Java底层:JVM
+            
+        </h1>
+        <div class="content">
+            <h1 id="谈谈你对java的理解"><a href="#谈谈你对java的理解" class="headerlink" title="谈谈你对java的理解"></a>谈谈你对java的理解</h1><ul>
+<li>平台无关性</li>
+<li>GC</li>
+<li>语言特性</li>
+<li>面向对象</li>
+<li>类库</li>
+<li>异常处理 <a id="more"></a></li>
+</ul>
+<h2 id="平台无关如何实现"><a href="#平台无关如何实现" class="headerlink" title="平台无关如何实现"></a>平台无关如何实现</h2><p>java源码首先被编译成字节码,再由不同平台的jvm进行解析,java语言在不同平台上运行时不需要重新编译,java虚拟机在执行字节码时,把字节码转换为具体平台上的机器指令</p>
+<h2 id="为什么jvm不直接将源码解析成机器码去执行"><a href="#为什么jvm不直接将源码解析成机器码去执行" class="headerlink" title="为什么jvm不直接将源码解析成机器码去执行"></a>为什么jvm不直接将源码解析成机器码去执行</h2><ul>
+<li>每次执行需要重新编译,进行语法检查语义分析等,性能就会受影响</li>
+<li>别的语言也可以解析成字节码</li>
+</ul>
+<h2 id="jvm如何加载-class文件"><a href="#jvm如何加载-class文件" class="headerlink" title="jvm如何加载.class文件"></a>jvm如何加载.class文件</h2><p><img src="http://img.usopp.online/markdown-img-paste-20190723162205317.png" alt></p>
+<p>jvm主要由ClassLoader,RuntimeDataArea,ExecutionEngine,NativeInterface这四部分组成,它通过classloader将符合特定格式的class文件加载到内存,再通过executionEngine对命令进行解析,并提交给操作系统执行</p>
+<h1 id="谈谈反射"><a href="#谈谈反射" class="headerlink" title="谈谈反射"></a>谈谈反射</h1><p><img src="http://img.usopp.online/markdown-img-paste-20190723162340932.png" alt></p>
+<h2 id="写一个例子"><a href="#写一个例子" class="headerlink" title="写一个例子"></a>写一个例子</h2><figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">public static void main(String[] args) throws ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException, NoSuchFieldException &#123;</span><br><span class="line">       Class rc = Class.forName(&quot;com.test.basic.Robot&quot;);</span><br><span class="line">       Robot r = (Robot) rc.newInstance();</span><br><span class="line">       System.out.println(&quot;class name is :&quot; + rc.getName());</span><br><span class="line"></span><br><span class="line">       Method getHello = rc.getDeclaredMethod(&quot;throwHello&quot;, String.class);</span><br><span class="line">       getHello.setAccessible(true);</span><br><span class="line">       Object str = getHello.invoke(r, &quot;bob&quot;);</span><br><span class="line">       System.out.println(&quot;get hello result:&quot; + str);</span><br><span class="line"></span><br><span class="line">       Method sayHi = rc.getMethod(&quot;sayHi&quot;, String.class);</span><br><span class="line">       sayHi.invoke(r, &quot;welcom&quot;);</span><br><span class="line"></span><br><span class="line">       Field name = rc.getDeclaredField(&quot;name&quot;);</span><br><span class="line">       name.setAccessible(true);</span><br><span class="line">       name.set(r, &quot;dd&quot;);</span><br><span class="line">       sayHi.invoke(r, &quot;welcome&quot;);</span><br><span class="line"></span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="类从编译到执行的过程"><a href="#类从编译到执行的过程" class="headerlink" title="类从编译到执行的过程"></a>类从编译到执行的过程</h2><p><img src="http://img.usopp.online/markdown-img-paste-2019072317200207.png" alt></p>
+<h1 id="谈谈classloader"><a href="#谈谈classloader" class="headerlink" title="谈谈classloader"></a>谈谈classloader</h1><p><img src="http://img.usopp.online/markdown-img-paste-20190723181046617.png" alt></p>
+<h2 id="classloader的种类"><a href="#classloader的种类" class="headerlink" title="classloader的种类"></a>classloader的种类</h2><p><img src="http://img.usopp.online/markdown-img-paste-20190723181033323.png" alt></p>
+<h2 id="自定义classloader的实现"><a href="#自定义classloader的实现" class="headerlink" title="自定义classloader的实现"></a>自定义classloader的实现</h2><h3 id="关键函数"><a href="#关键函数" class="headerlink" title="关键函数"></a>关键函数</h3><p><img src="http://img.usopp.online/markdown-img-paste-20190723181257497.png" alt></p>
+<figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">public class MyClassLoader extends ClassLoader &#123;</span><br><span class="line"></span><br><span class="line">    private String path;</span><br><span class="line">    private String classLoaderName;</span><br><span class="line"></span><br><span class="line">    public MyClassLoader(String path, String classLoaderName) &#123;</span><br><span class="line">        this.path = path;</span><br><span class="line">        this.classLoaderName = classLoaderName;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected Class findClass(String name) &#123;</span><br><span class="line">        byte[] b = loadClassData(name);</span><br><span class="line">        return defineClass(name, b, 0, b.length);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private byte[] loadClassData(String name) &#123;</span><br><span class="line">        name = path + name + &quot;.class&quot;;</span><br><span class="line">        InputStream in = null;</span><br><span class="line">        ByteArrayOutputStream out = null;</span><br><span class="line">        try &#123;</span><br><span class="line">            in = new FileInputStream(new File(name));</span><br><span class="line">            out = new ByteArrayOutputStream();</span><br><span class="line">            int i = 0;</span><br><span class="line">            while ((i = in.read()) != -1) &#123;</span><br><span class="line">                out.write(i);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; catch (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; finally &#123;</span><br><span class="line">            try &#123;</span><br><span class="line">                in.close();</span><br><span class="line">                out.close();</span><br><span class="line">            &#125; catch (IOException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        return out.toByteArray();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public static void main(String[] args) throws ClassNotFoundException, IllegalAccessException, InstantiationException &#123;</span><br><span class="line">      MyClassLoader myClassLoader = new MyClassLoader(&quot;/home/zw/Documents/&quot;,&quot;Wali&quot;);</span><br><span class="line">      Class c = myClassLoader.loadClass(&quot;Wali&quot;);</span><br><span class="line">      System.out.println(c.getClassLoader());</span><br><span class="line">      c.newInstance();</span><br><span class="line"></span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="谈谈类加载的双亲委派机制"><a href="#谈谈类加载的双亲委派机制" class="headerlink" title="谈谈类加载的双亲委派机制"></a>谈谈类加载的双亲委派机制</h2><p><img src="http://img.usopp.online/markdown-img-paste-20190723185304956.png" alt></p>
+<h3 id="为什么使用双亲委派机制"><a href="#为什么使用双亲委派机制" class="headerlink" title="为什么使用双亲委派机制"></a>为什么使用双亲委派机制</h3><p>避免多份同样的字节码的加载</p>
+<h1 id="类加载的方式"><a href="#类加载的方式" class="headerlink" title="类加载的方式"></a>类加载的方式</h1><ul>
+<li>隐式加载:new</li>
+<li>显式加载:loadClass,forName等</li>
+</ul>
+<h2 id="loadClass和forName的区别"><a href="#loadClass和forName的区别" class="headerlink" title="loadClass和forName的区别"></a>loadClass和forName的区别</h2><ul>
+<li>类的装载过程</li>
+</ul>
+<p><img src="http://img.usopp.online/markdown-img-paste-20190724093552920.png" alt></p>
+<ul>
+<li>区别:forName得到的class是完成初始化的,loadClass得到的class还没有链接</li>
+</ul>
+<figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) throws ClassNotFoundException &#123;</span><br><span class="line">//        ClassLoader cl = Robot.class.getClassLoader();</span><br><span class="line">    Class c = Class.forName(&quot;com.test.basic.Robot&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>forName用于需要执行初始化的类,loadClass用于延时加载,加快加载速度</li>
+</ul>
+<h1 id="Java的内存模型"><a href="#Java的内存模型" class="headerlink" title="Java的内存模型"></a>Java的内存模型</h1><h2 id="内存简介"><a href="#内存简介" class="headerlink" title="内存简介"></a>内存简介</h2><p><img src="http://img.usopp.online/markdown-img-paste-20190724114235428.png" alt></p>
+<h2 id="地址空间的划分"><a href="#地址空间的划分" class="headerlink" title="地址空间的划分"></a>地址空间的划分</h2><p><img src="http://img.usopp.online/markdown-img-paste-20190724114315670.png" alt></p>
+<p>java的内存空间在用户空间</p>
+<p>内存空间即RuntimeDataArea</p>
+<p><img src="http://img.usopp.online/markdown-img-paste-20190724095743734.png" alt></p>
+<h2 id="程序计数器-Program-Counter-Register"><a href="#程序计数器-Program-Counter-Register" class="headerlink" title="程序计数器(Program Counter Register)"></a>程序计数器(Program Counter Register)</h2><p><img src="http://img.usopp.online/markdown-img-paste-20190724100306582.png" alt></p>
+<p>程序计数器是逻辑计数器,为了线程切换后都能恢复正确的执行位置,每个线程都有独立的程序计数器,并且只为java方法计数</p>
+<h2 id="java虚拟机栈-Stack"><a href="#java虚拟机栈-Stack" class="headerlink" title="java虚拟机栈(Stack)"></a>java虚拟机栈(Stack)</h2><p><img src="http://img.usopp.online/markdown-img-paste-20190724105044787.png" alt> 虚拟机栈包含了单个线程每个方法执行的栈帧,栈帧存储了局部变量表,操作栈,动态连接,方法出口</p>
+<h3 id="局部变量表和操作数栈"><a href="#局部变量表和操作数栈" class="headerlink" title="局部变量表和操作数栈"></a>局部变量表和操作数栈</h3><p><img src="http://img.usopp.online/markdown-img-paste-20190724105526470.png" alt></p>
+<p><img src="http://img.usopp.online/markdown-img-paste-20190724112330648.png" alt> 局部变量表为操作数栈提供数据支撑</p>
+<h3 id="递归为什么会导致StackOverFlow异常"><a href="#递归为什么会导致StackOverFlow异常" class="headerlink" title="递归为什么会导致StackOverFlow异常"></a>递归为什么会导致StackOverFlow异常</h3><ul>
+<li>递归过深,栈帧超出虚拟栈深度</li>
+</ul>
+<h3 id="虚拟机栈过多会引发OutOfMemory异常"><a href="#虚拟机栈过多会引发OutOfMemory异常" class="headerlink" title="虚拟机栈过多会引发OutOfMemory异常"></a>虚拟机栈过多会引发OutOfMemory异常</h3><h2 id="本地方法栈"><a href="#本地方法栈" class="headerlink" title="本地方法栈"></a>本地方法栈</h2><p>与虚拟机栈类似,主要作用于标注了native的方法</p>
+<h2 id="元空间-MetaSpace-与永久代-PermGen"><a href="#元空间-MetaSpace-与永久代-PermGen" class="headerlink" title="元空间(MetaSpace)与永久代(PermGen)"></a>元空间(MetaSpace)与永久代(PermGen)</h2><p>在jdk7以后,把类的元数据放在本地堆内存中,这块区域叫MetaSpace,该区域在jdk7以前属于永久代,二者都是用来储存class的相关信息,包括class对象的method,filed.</p>
+<p>元空间和永久代都是方法区的实现,方法区只是jvm的规范.</p>
+<p>在java7之后,原先位于方法区的字符串常量池被移动到java堆中,并且在java8后使用元空间替换永久代.</p>
+<p>元空间使用的本地内存,而永久代使用的是jvm的内存. 这样的好处是解决了空间不足,其大小是动态分配的</p>
+<p><img src="http://img.usopp.online/markdown-img-paste-20190724114942538.png" alt></p>
+<p>元空间内存空间使用的是本机内存,没有了字符串常量池(java7后被移动到了堆中),永久代的空间有限</p>
+<h2 id="java堆-Heap"><a href="#java堆-Heap" class="headerlink" title="java堆(Heap)"></a>java堆(Heap)</h2><p><img src="http://img.usopp.online/markdown-img-paste-20190724120421198.png" alt></p>
+<h3 id="JVM三大性能调优参数-Xms-Xmx-Xss的含义"><a href="#JVM三大性能调优参数-Xms-Xmx-Xss的含义" class="headerlink" title="JVM三大性能调优参数-Xms -Xmx -Xss的含义"></a>JVM三大性能调优参数-Xms -Xmx -Xss的含义</h3><figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -Xms128m -Xmx128m -Xss256k -jar xxx.jar</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Xss:规定了每个线程虚拟机栈(堆栈)的大小(一般情况256k足够,将会影响并发线程数的大小)</li>
+<li>Xms:堆的初始值(一旦对象容量超过java堆的容量,会进行扩容)</li>
+<li>Xmx:堆能达到的最大值(一般情况设置成和xms一致,不会发生抖动)</li>
+</ul>
+<h2 id="java内存模型中堆和栈的区别"><a href="#java内存模型中堆和栈的区别" class="headerlink" title="java内存模型中堆和栈的区别"></a>java内存模型中堆和栈的区别</h2><h3 id="内存分配策略"><a href="#内存分配策略" class="headerlink" title="内存分配策略"></a>内存分配策略</h3><p><img src="http://img.usopp.online/markdown-img-paste-20190724131858523.png" alt></p>
+<h3 id="联系"><a href="#联系" class="headerlink" title="联系"></a>联系</h3><p><img src="http://img.usopp.online/markdown-img-paste-20190724132035822.png" alt></p>
+<h3 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h3><ul>
+<li>管理方式:栈自动释放,堆需要GC</li>
+<li>空间大小:栈比堆小</li>
+<li>碎片相关:栈产生的碎片远小于堆</li>
+<li>分配方式:栈支持静态和动态分配,而堆只支持动态分配</li>
+<li>效率:栈的效率比堆高</li>
+</ul>
+<h2 id="元空间-堆-线程独占部分空间的联系-内存角度"><a href="#元空间-堆-线程独占部分空间的联系-内存角度" class="headerlink" title="元空间,堆,线程独占部分空间的联系-内存角度"></a>元空间,堆,线程独占部分空间的联系-内存角度</h2><p><img src="http://img.usopp.online/markdown-img-paste-20190724132901495.png" alt></p>
+<p><img src="http://img.usopp.online/markdown-img-paste-20190724133111120.png" alt></p>
+<h2 id="不同JDK版本之间intern-方法的区别-JDK6-VS-JDK6"><a href="#不同JDK版本之间intern-方法的区别-JDK6-VS-JDK6" class="headerlink" title="不同JDK版本之间intern()方法的区别-JDK6 VS JDK6+"></a>不同JDK版本之间intern()方法的区别-JDK6 VS JDK6+</h2><figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">String s = new String(&quot;a&quot;);</span><br><span class="line">s.intern();</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://img.usopp.online/markdown-img-paste-20190724133630467.png" alt></p>
+<p>jdk6+不仅能在池中添加对象,还能在池中添加堆中的引用</p>
+<p><img src="http://img.usopp.online/markdown-img-paste-20190724142051969.png" alt></p>
+<ul>
+<li>jdk6:flase false</li>
+</ul>
+<p><img src="http://img.usopp.online/markdown-img-paste-20190724142845533.png" alt></p>
+<ul>
+<li>jdk6+:false true</li>
+</ul>
+<p><img src="http://img.usopp.online/markdown-img-paste-20190724142928166.png" alt></p>
+
+        </div>
+        
+        
+        
+        <div class="social-share" data-sites="wechat,qq,weibo,douban,twitter,facebook"></div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js@1.0.16/dist/css/share.min.css">
+<script src="https://cdn.jsdelivr.net/npm/social-share.js@1.0.16/dist/js/social-share.min.js"></script>
+
+        
+    </div>
+</div>
+
+
+
+
+
+<div class="card card-transparent">
+    <div class="level post-navigation is-flex-wrap is-mobile">
+        
+        <div class="level-start">
+            <a class="level level-item has-link-grey  article-nav-prev" href="/2019/07/24/Java底层-gc/">
+                <i class="level-item fas fa-chevron-left"></i>
+                <span class="level-item">Java底层:GC</span>
+            </a>
+        </div>
+        
+        
+        <div class="level-end">
+            <a class="level level-item has-link-grey  article-nav-next" href="/2019/07/23/linux/">
+                <span class="level-item">linux</span>
+                <i class="level-item fas fa-chevron-right"></i>
+            </a>
+        </div>
+        
+    </div>
+</div>
+
+
+
+<div class="card">
+    <div class="card-content">
+        <h3 class="title is-5 has-text-weight-normal">Comments</h3>
+        
+<div id="comment-container"></div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.4.1/dist/gitalk.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1.4.1/dist/gitalk.min.js"></script>
+<script>
+    var gitalk = new Gitalk({
+        clientID: '0c679442f41c98e22358',
+        clientSecret: '2d72f47a5ab373f666cf58e7ef87882eff5dfffb',
+        id: 'ae341844d6d87adbce17280aed7b785a',
+        repo: 'sanwanliu.github.io',
+        owner: 'sanwanliu',
+        admin: "sanwanliu",
+        createIssueManually: false,
+        distractionFreeMode: false
+    })
+    gitalk.render('comment-container')
+</script>
+
+    </div>
+</div>
+</div>
+                
+                
+
+
+
+
+<div class="column is-4-tablet is-4-desktop is-4-widescreen  has-order-3 column-right ">
+    
+        
+<div class="card widget">
+    <div class="card-content">
+        <nav class="level">
+            <div class="level-item has-text-centered" style="flex-shrink: 1">
+                <div>
+                    
+                    <figure class="image is-128x128 has-mb-6">
+                        <img class=is-rounded src="/images/avatar.png" alt="sanwanliu">
+                    </figure>
+                    
+                    <p class="is-size-4 is-block">
+                        sanwanliu
+                    </p>
+                    
+                    
+                    
+                </div>
+            </div>
+        </nav>
+        <nav class="level is-mobile">
+            <div class="level-item has-text-centered is-marginless">
+                <div>
+                    <p class="heading">
+                        Posts
+                    </p>
+                    <p class="title has-text-weight-normal">
+                        31
+                    </p>
+                </div>
+            </div>
+            <div class="level-item has-text-centered is-marginless">
+                <div>
+                    <p class="heading">
+                        Categories
+                    </p>
+                    <p class="title has-text-weight-normal">
+                        6
+                    </p>
+                </div>
+            </div>
+            <div class="level-item has-text-centered is-marginless">
+                <div>
+                    <p class="heading">
+                        Tags
+                    </p>
+                    <p class="title has-text-weight-normal">
+                        14
+                    </p>
+                </div>
+            </div>
+        </nav>
+        <div class="level">
+            <a class="level-item button is-link is-rounded" href="https://github.com/sanwanliu" target="_blank">
+                Follow</a>
+        </div>
+        
+        
+    </div>
+</div>
+    
+        
+    
+        
+<div class="card widget">
+    <div class="card-content">
+        <h3 class="menu-label">
+            Tag Cloud
+        </h3>
+        <a href="/tags/BST/" style="font-size: 10px;">BST</a> <a href="/tags/array/" style="font-size: 10px;">array</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/map/" style="font-size: 13.33px;">map</a> <a href="/tags/notbest/" style="font-size: 10px;">notbest</a> <a href="/tags/priorityQueue/" style="font-size: 10px;">priorityQueue</a> <a href="/tags/priorityQueue-dequeue-queue/" style="font-size: 10px;">priorityQueue dequeue queue</a> <a href="/tags/queue/" style="font-size: 13.33px;">queue</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/stack/" style="font-size: 10px;">stack</a> <a href="/tags/tree/" style="font-size: 20px;">tree</a> <a href="/tags/two-pointers/" style="font-size: 10px;">two-pointers</a> <a href="/tags/栈/" style="font-size: 10px;">栈</a> <a href="/tags/链表/" style="font-size: 16.67px;">链表</a>
+    </div>
+</div>
+
+    
+        
+<div class="card widget">
+    <div class="card-content">
+        <h3 class="menu-label">
+            Recent
+        </h3>
+        
+        <article class="media">
+            
+            <a href="/2019/09/05/21-递归和分治/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/images/thumbnail.svg" alt="21.递归和分治">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-09-05T08:13:55.000Z">2019-09-05</time></div>
+                    <a href="/2019/09/05/21-递归和分治/" class="title has-link-black-ter is-size-6 has-text-weight-normal">21.递归和分治</a>
+                    <p class="is-size-7 is-uppercase">
+                        
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2019/08/13/Java常用类库/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/images/thumbnail.svg" alt="Java常用类库">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-08-13T11:17:42.000Z">2019-08-13</time></div>
+                    <a href="/2019/08/13/Java常用类库/" class="title has-link-black-ter is-size-6 has-text-weight-normal">Java常用类库</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/java/">java</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2019/08/13/Java框架-Spring/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/images/thumbnail.svg" alt="Java框架-Spring">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-08-13T07:25:45.000Z">2019-08-13</time></div>
+                    <a href="/2019/08/13/Java框架-Spring/" class="title has-link-black-ter is-size-6 has-text-weight-normal">Java框架-Spring</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/java/">java</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2019/07/26/Java多线程和并发-原理/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/images/thumbnail.svg" alt="Java多线程和并发-原理">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-07-26T07:38:23.000Z">2019-07-26</time></div>
+                    <a href="/2019/07/26/Java多线程和并发-原理/" class="title has-link-black-ter is-size-6 has-text-weight-normal">Java多线程和并发-原理</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/java/">java</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2019/07/24/Java多线程和并发/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/images/thumbnail.svg" alt="Java多线程和并发">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-07-24T11:31:45.000Z">2019-07-24</time></div>
+                    <a href="/2019/07/24/Java多线程和并发/" class="title has-link-black-ter is-size-6 has-text-weight-normal">Java多线程和并发</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/java/">java</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+    </div>
+</div>
+
+    
+        <div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+        <h3 class="menu-label">
+            Archives
+        </h3>
+        <ul class="menu-list">
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2019/09/">
+                <span class="level-start">
+                    <span class="level-item">September 2019</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">1</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2019/08/">
+                <span class="level-start">
+                    <span class="level-item">August 2019</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">2</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2019/07/">
+                <span class="level-start">
+                    <span class="level-item">July 2019</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">28</span>
+                </span>
+            </a>
+        </li>
+        
+        </ul>
+        </div>
+    </div>
+</div>
+    
+        <div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+            <h3 class="menu-label">
+                Tags
+            </h3>
+            <div class="field is-grouped is-grouped-multiline">
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/BST/">
+                        <span class="tag">BST</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/array/">
+                        <span class="tag">array</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/linux/">
+                        <span class="tag">linux</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/map/">
+                        <span class="tag">map</span>
+                        <span class="tag is-grey">2</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/notbest/">
+                        <span class="tag">notbest</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/priorityQueue/">
+                        <span class="tag">priorityQueue</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/priorityQueue-dequeue-queue/">
+                        <span class="tag">priorityQueue dequeue queue</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/queue/">
+                        <span class="tag">queue</span>
+                        <span class="tag is-grey">2</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/redis/">
+                        <span class="tag">redis</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/stack/">
+                        <span class="tag">stack</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/tree/">
+                        <span class="tag">tree</span>
+                        <span class="tag is-grey">4</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/two-pointers/">
+                        <span class="tag">two-pointers</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/栈/">
+                        <span class="tag">栈</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/链表/">
+                        <span class="tag">链表</span>
+                        <span class="tag is-grey">3</span>
+                    </a>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+    
+    
+</div>
+
+            </div>
+        </div>
+    </section>
+    <footer class="footer">
+    <div class="container">
+        <div class="level">
+            <div class="level-start has-text-centered-mobile">
+                <p class="is-size-7">
+                &copy; 2019 sanwanliu&nbsp;
+                Powered by <a href="https://hexo.io/" target="_blank">Hexo</a> & <a
+                        href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank">Icarus</a>
+                
+                </p>
+            </div>
+            <div class="level-end">
+            
+                <div class="field has-addons is-flex-center-mobile has-mt-5-mobile is-flex-wrap is-flex-middle">
+                
+                
+                <p class="control">
+                    <a class="button is-white is-large" target="_blank" title="Creative Commons" href="https://creativecommons.org/">
+                        
+                        <i class="fab fa-creative-commons"></i>
+                        
+                    </a>
+                </p>
+                
+                <p class="control">
+                    <a class="button is-white is-large" target="_blank" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/">
+                        
+                        <i class="fab fa-creative-commons-by"></i>
+                        
+                    </a>
+                </p>
+                
+                </div>
+            
+            </div>
+        </div>
+    </div>
+</footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script>
+<script>moment.locale("en");</script>
+
+<script>
+var IcarusThemeSettings = {
+    article: {
+        highlight: {
+            clipboard: true,
+            fold: 'unfolded'
+        }
+    }
+};
+</script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script>
+
+
+
+    
+    
+    
+    <script src="/js/animation.js"></script>
+    
+
+    
+    
+    
+    <script src="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/js/lightgallery.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js" defer></script>
+    <script src="/js/gallery.js" defer></script>
+    
+
+    
+    
+
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update
+            my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/outdatedbrowser@1.1.5/outdatedbrowser/outdatedbrowser.min.js" defer></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        });
+    });
+</script>
+
+
+    
+    
+<script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/unpacked/MathJax.js?config=TeX-MML-AM_CHTML" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    MathJax.Hub.Config({
+        'HTML-CSS': {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+});
+</script>
+
+    
+    
+
+<a id="back-to-top" title="Back to Top" href="javascript:;">
+    <i class="fas fa-chevron-up"></i>
+</a>
+<script src="/js/back-to-top.js" defer></script>
+
+
+    
+    
+
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+
+
+<script src="/js/main.js" defer></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something..." />
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js" defer></script>
+<link rel="stylesheet" href="/css/search.css">
+<link rel="stylesheet" href="/css/insight.css">
+    
+</body>
+</html>
