@@ -19,7 +19,7 @@
 <meta property="og:description" content="problemGiven a binary search tree (BST), find the lowest common ancestor (LCA) of two given nodes in the BST. According to the definition of LCA on Wikipedia: “The lowest common ancestor is defined be">
 <meta property="og:locale" content="en">
 <meta property="og:image" content="https://sanwanliu.github.io/images/og_image.png">
-<meta property="og:updated_time" content="2019-09-15T12:16:13.353Z">
+<meta property="og:updated_time" content="2019-09-16T08:48:01.627Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="19.二叉搜索树_最近公共祖先:leetcode235">
 <meta name="twitter:description" content="problemGiven a binary search tree (BST), find the lowest common ancestor (LCA) of two given nodes in the BST. According to the definition of LCA on Wikipedia: “The lowest common ancestor is defined be">
@@ -156,8 +156,8 @@
                 </time>
                 
                 <i class="far fa-calendar-check"></i>&nbsp;
-                <time class="level-item has-text-grey is-hidden-mobile" datetime="2019-09-15T12:16:13.353Z">
-                    2019-09-15
+                <time class="level-item has-text-grey is-hidden-mobile" datetime="2019-09-16T08:48:01.627Z">
+                    2019-09-16
                 </time>
                 
                 
@@ -171,7 +171,7 @@
                     <i class="far fa-clock"></i>&nbsp;
                     
                     
-                    2 minutes read (About 259 words)
+                    2 minutes read (About 361 words)
                 </span>
                 
                 
@@ -184,7 +184,7 @@
         </div>
         
         <div class="content">
-            <h1 id="problem"><a href="#problem" class="headerlink" title="problem"></a>problem</h1><p>Given a binary search tree (BST), find the lowest common ancestor (LCA) of two given nodes in the BST.</p>
+            <h2 id="problem"><a href="#problem" class="headerlink" title="problem"></a>problem</h2><p>Given a binary search tree (BST), find the lowest common ancestor (LCA) of two given nodes in the BST.</p>
 <p>According to the definition of LCA on Wikipedia: “The lowest common ancestor is defined between two nodes p and q as the lowest node in T that has both p and q as descendants (where we allow a node to be a descendant of itself).” </p>
 <a id="more"></a>
 
@@ -198,9 +198,16 @@
 <p>Note:</p>
 <p>All of the nodes’ values will be unique. p and q are different and both values will exist in the BST.</p>
 <p>初步分析: 1.分别得到两个节点的路径,再比较路径</p>
-<h1 id="approach-1-递归"><a href="#approach-1-递归" class="headerlink" title="approach 1:递归"></a>approach 1:递归</h1><h1 id="算法"><a href="#算法" class="headerlink" title="算法"></a>算法</h1><figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line"> * @lc app=leetcode id=235 lang=java</span><br><span class="line"> *</span><br><span class="line"> * [235] Lowest Common Ancestor of a Binary Search Tree</span><br><span class="line"> */</span><br><span class="line">/**</span><br><span class="line"> * Definition for a binary tree node. public class TreeNode &#123; int val; TreeNode</span><br><span class="line"> * left; TreeNode right; TreeNode(int x) &#123; val = x; &#125; &#125;</span><br><span class="line"> */</span><br><span class="line">class Solution &#123;</span><br><span class="line">    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) &#123;</span><br><span class="line">        if (root == null || p == null || q == null) &#123;</span><br><span class="line">            return null;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        if (root.val &gt; p.val &amp;&amp; root.val &gt; q.val) &#123;</span><br><span class="line">            return lowestCommonAncestor(root.left, p, q);</span><br><span class="line">        &#125;</span><br><span class="line">        if (root.val &lt; p.val &amp;&amp; root.val &lt; q.val) &#123;</span><br><span class="line">            return lowestCommonAncestor(root.right, p, q);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        return root;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="approach-1-递归"><a href="#approach-1-递归" class="headerlink" title="approach 1:递归"></a>approach 1:递归</h2><figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-comment">/*</span></span><br><span class="line"><span class="hljs-comment"> * @lc app=leetcode id=235 lang=java</span></span><br><span class="line"><span class="hljs-comment"> *</span></span><br><span class="line"><span class="hljs-comment"> * [235] Lowest Common Ancestor of a Binary Search Tree</span></span><br><span class="line"><span class="hljs-comment"> */</span></span><br><span class="line"><span class="hljs-comment">/**</span></span><br><span class="line"><span class="hljs-comment"> * Definition for a binary tree node. public class TreeNode &#123; int val; TreeNode</span></span><br><span class="line"><span class="hljs-comment"> * left; TreeNode right; TreeNode(int x) &#123; val = x; &#125; &#125;</span></span><br><span class="line"><span class="hljs-comment"> */</span></span><br><span class="line"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">public</span> TreeNode <span class="hljs-title">lowestCommonAncestor</span><span class="hljs-params">(TreeNode root, TreeNode p, TreeNode q)</span> </span>&#123;</span><br><span class="line">        <span class="hljs-keyword">if</span> (root == <span class="hljs-keyword">null</span> || p == <span class="hljs-keyword">null</span> || q == <span class="hljs-keyword">null</span>) &#123;</span><br><span class="line">            <span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="hljs-keyword">if</span> (root.val &gt; p.val &amp;&amp; root.val &gt; q.val) &#123;</span><br><span class="line">            <span class="hljs-keyword">return</span> lowestCommonAncestor(root.left, p, q);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="hljs-keyword">if</span> (root.val &lt; p.val &amp;&amp; root.val &lt; q.val) &#123;</span><br><span class="line">            <span class="hljs-keyword">return</span> lowestCommonAncestor(root.right, p, q);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="hljs-keyword">return</span> root;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h1 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h1><ul>
+<p>如果p和q都大于root，去左子树找；如果p和q都小于root，去右子树找；否则，p和q进行分叉，root就是要找的节点</p>
+<p>非递归版本：</p>
+<figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">public</span> TreeNode <span class="hljs-title">lowestCommonAncestor</span><span class="hljs-params">(TreeNode root, TreeNode p, TreeNode q)</span> </span>&#123;</span><br><span class="line">        <span class="hljs-keyword">while</span> (root != <span class="hljs-keyword">null</span>) &#123;</span><br><span class="line">            <span class="hljs-keyword">if</span> (root.val &gt; p.val &amp;&amp; root.val &gt; q.val) &#123;</span><br><span class="line">                root = root.left;</span><br><span class="line">            &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (root.val &lt; p.val &amp;&amp; root.val &lt; q.val) &#123;</span><br><span class="line">                root = root.right;</span><br><span class="line">            &#125; <span class="hljs-keyword">else</span> &#123;</span><br><span class="line">                <span class="hljs-keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="hljs-keyword">return</span> root;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>复杂度</p>
+</blockquote>
+<ul>
 <li>time:O(n)</li>
 <li>space:O(n)</li>
 </ul>
@@ -372,14 +379,6 @@
         <a class="is-flex" href="#approach-1-递归">
         <span class="has-mr-6">2</span>
         <span>approach 1:递归</span>
-        </a></li><li>
-        <a class="is-flex" href="#算法">
-        <span class="has-mr-6">3</span>
-        <span>算法</span>
-        </a></li><li>
-        <a class="is-flex" href="#复杂度">
-        <span class="has-mr-6">4</span>
-        <span>复杂度</span>
         </a></li></ul>
         </div>
     </div>
