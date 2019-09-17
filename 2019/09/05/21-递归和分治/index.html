@@ -10,18 +10,18 @@
 <title>21.递归和分治:leetcode-50 - Blog</title>
 
 
-    <meta name="description" content="problem123456Implement pow(x, n).  eg. 2^2 = 2^1 * 2^1 = (2^0 * 2^0 * 2) * (2^0 * 2^0 * 2) = (1 * 1 * 2) * (1 * 1 * 2) = 4  eg. 2^3 = 2^1 * 2^1 * 2 = (2^0 * 2^0 * 2) * (2^0 * 2^0 * 2) * 2 = (1 * 1 * 2">
+    <meta name="description" content="Implement pow(x, n). eg. 2^2 = 2^1 * 2^1 = (2^0 * 2^0 * 2) * (2^0 * 2^0 * 2) = (1 * 1 * 2) * (1 * 1 * 2) = 4 eg. 2^3 = 2^1 * 2^1 * 2 = (2^0 * 2^0 * 2) * (2^0 * 2^0 * 2) * 2 = (1 * 1 * 2) * (1 * 1 * 2)">
 <meta property="og:type" content="article">
 <meta property="og:title" content="21.递归和分治:leetcode-50">
 <meta property="og:url" content="https://sanwanliu.github.io/2019/09/05/21-递归和分治/index.html">
 <meta property="og:site_name" content="Blog">
-<meta property="og:description" content="problem123456Implement pow(x, n).  eg. 2^2 = 2^1 * 2^1 = (2^0 * 2^0 * 2) * (2^0 * 2^0 * 2) = (1 * 1 * 2) * (1 * 1 * 2) = 4  eg. 2^3 = 2^1 * 2^1 * 2 = (2^0 * 2^0 * 2) * (2^0 * 2^0 * 2) * 2 = (1 * 1 * 2">
+<meta property="og:description" content="Implement pow(x, n). eg. 2^2 = 2^1 * 2^1 = (2^0 * 2^0 * 2) * (2^0 * 2^0 * 2) = (1 * 1 * 2) * (1 * 1 * 2) = 4 eg. 2^3 = 2^1 * 2^1 * 2 = (2^0 * 2^0 * 2) * (2^0 * 2^0 * 2) * 2 = (1 * 1 * 2) * (1 * 1 * 2)">
 <meta property="og:locale" content="en">
 <meta property="og:image" content="https://sanwanliu.github.io/images/og_image.png">
-<meta property="og:updated_time" content="2019-09-17T08:18:07.002Z">
+<meta property="og:updated_time" content="2019-09-17T08:20:15.891Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="21.递归和分治:leetcode-50">
-<meta name="twitter:description" content="problem123456Implement pow(x, n).  eg. 2^2 = 2^1 * 2^1 = (2^0 * 2^0 * 2) * (2^0 * 2^0 * 2) = (1 * 1 * 2) * (1 * 1 * 2) = 4  eg. 2^3 = 2^1 * 2^1 * 2 = (2^0 * 2^0 * 2) * (2^0 * 2^0 * 2) * 2 = (1 * 1 * 2">
+<meta name="twitter:description" content="Implement pow(x, n). eg. 2^2 = 2^1 * 2^1 = (2^0 * 2^0 * 2) * (2^0 * 2^0 * 2) = (1 * 1 * 2) * (1 * 1 * 2) = 4 eg. 2^3 = 2^1 * 2^1 * 2 = (2^0 * 2^0 * 2) * (2^0 * 2^0 * 2) * 2 = (1 * 1 * 2) * (1 * 1 * 2)">
 <meta name="twitter:image" content="https://sanwanliu.github.io/images/og_image.png">
 
 
@@ -155,7 +155,7 @@
                 </time>
                 
                 <i class="far fa-calendar-check"></i>&nbsp;
-                <time class="level-item has-text-grey is-hidden-mobile" datetime="2019-09-17T08:18:07.002Z">
+                <time class="level-item has-text-grey is-hidden-mobile" datetime="2019-09-17T08:20:15.891Z">
                     2019-09-17
                 </time>
                 
@@ -170,7 +170,7 @@
                     <i class="far fa-clock"></i>&nbsp;
                     
                     
-                    a few seconds read (About 105 words)
+                    a few seconds read (About 103 words)
                 </span>
                 
                 
@@ -183,10 +183,12 @@
         </div>
         
         <div class="content">
-            <h1 id="problem"><a href="#problem" class="headerlink" title="problem"></a>problem</h1><figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Implement pow(x, n).</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  eg. 2^2 = 2^1 * 2^1 = (2^0 * 2^0 * 2) * (2^0 * 2^0 * 2) = (1 * 1 * 2) * (1 * 1 * 2) = 4</span><br><span class="line"></span><br><span class="line">  eg. 2^3 = 2^1 * 2^1 * 2 = (2^0 * 2^0 * 2) * (2^0 * 2^0 * 2) * 2 = (1 * 1 * 2) * (1 * 1 * 2) * 2 = 8</span><br></pre></td></tr></table></figure>
+            <p>Implement pow(x, n).</p>
+<p>eg. 2^2 = 2^1 * 2^1 = (2^0 * 2^0 * 2) * (2^0 * 2^0 * 2) = (1 * 1 * 2) * (1 * 1 * 2) = 4</p>
+<p>eg. 2^3 = 2^1 * 2^1 * 2 = (2^0 * 2^0 * 2) * (2^0 * 2^0 * 2) * 2 = (1 * 1 * 2) * (1 * 1 * 2) * 2 = 8</p>
+<a id="more"></a>
 
-<h1 id="approach1"><a href="#approach1" class="headerlink" title="approach1"></a>approach1</h1><a id="more"></a>
-<figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">double</span> <span class="hljs-title">myPow</span><span class="hljs-params">(<span class="hljs-keyword">double</span> x, <span class="hljs-keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="hljs-keyword">return</span> pow(x, n);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">double</span> <span class="hljs-title">pow</span><span class="hljs-params">(<span class="hljs-keyword">double</span> x,<span class="hljs-keyword">long</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="hljs-keyword">if</span> (n == <span class="hljs-number">0</span>) &#123;</span><br><span class="line">            <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="hljs-keyword">if</span> (n &lt; <span class="hljs-number">0</span>) &#123;</span><br><span class="line">            <span class="hljs-keyword">return</span> <span class="hljs-number">1</span> / pow(x, -n);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="hljs-keyword">if</span> (n % <span class="hljs-number">2</span> == <span class="hljs-number">1</span>) &#123;</span><br><span class="line">            <span class="hljs-keyword">return</span> x * pow(x * x, n / <span class="hljs-number">2</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="hljs-keyword">return</span> pow(x * x, n / <span class="hljs-number">2</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="approach1"><a href="#approach1" class="headerlink" title="approach1"></a>approach1</h1><figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">double</span> <span class="hljs-title">myPow</span><span class="hljs-params">(<span class="hljs-keyword">double</span> x, <span class="hljs-keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="hljs-keyword">return</span> pow(x, n);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">double</span> <span class="hljs-title">pow</span><span class="hljs-params">(<span class="hljs-keyword">double</span> x,<span class="hljs-keyword">long</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="hljs-keyword">if</span> (n == <span class="hljs-number">0</span>) &#123;</span><br><span class="line">            <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="hljs-keyword">if</span> (n &lt; <span class="hljs-number">0</span>) &#123;</span><br><span class="line">            <span class="hljs-keyword">return</span> <span class="hljs-number">1</span> / pow(x, -n);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="hljs-keyword">if</span> (n % <span class="hljs-number">2</span> == <span class="hljs-number">1</span>) &#123;</span><br><span class="line">            <span class="hljs-keyword">return</span> x * pow(x * x, n / <span class="hljs-number">2</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="hljs-keyword">return</span> pow(x * x, n / <span class="hljs-number">2</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>time: O(logn)<br>space: O(logn)</p>
 <h1 id="approach2"><a href="#approach2" class="headerlink" title="approach2"></a>approach2</h1><figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">double</span> <span class="hljs-title">myPow2</span><span class="hljs-params">(<span class="hljs-keyword">double</span> x, <span class="hljs-keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="hljs-keyword">if</span> (n == <span class="hljs-number">0</span>) <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;</span><br><span class="line">    <span class="hljs-keyword">double</span> res = <span class="hljs-number">1</span>;</span><br><span class="line">    <span class="hljs-comment">// int : -6.. ~ +6..  -2^32 ~ 2 ^32-1 Integer.MIN_VALUE</span></span><br><span class="line">    <span class="hljs-keyword">long</span> abs = Math.abs((<span class="hljs-keyword">long</span>)n);</span><br><span class="line">    <span class="hljs-keyword">while</span> (abs &gt; <span class="hljs-number">0</span>) &#123;</span><br><span class="line">        <span class="hljs-keyword">if</span> (abs % <span class="hljs-number">2</span> != <span class="hljs-number">0</span>) &#123;</span><br><span class="line">            res *= x;</span><br><span class="line">        &#125;</span><br><span class="line">        x *= x;</span><br><span class="line">        abs /= <span class="hljs-number">2</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="hljs-keyword">if</span> (n &lt; <span class="hljs-number">0</span>) &#123;</span><br><span class="line">        <span class="hljs-keyword">return</span> <span class="hljs-number">1.0</span> / res;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="hljs-keyword">return</span> res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -336,16 +338,12 @@
                 Catalogue
             </h3>
             <ul class="menu-list"><li>
-        <a class="is-flex" href="#problem">
-        <span class="has-mr-6">1</span>
-        <span>problem</span>
-        </a></li><li>
         <a class="is-flex" href="#approach1">
-        <span class="has-mr-6">2</span>
+        <span class="has-mr-6">1</span>
         <span>approach1</span>
         </a></li><li>
         <a class="is-flex" href="#approach2">
-        <span class="has-mr-6">3</span>
+        <span class="has-mr-6">2</span>
         <span>approach2</span>
         </a></li></ul>
         </div>
