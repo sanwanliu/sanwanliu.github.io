@@ -18,7 +18,7 @@
 <meta property="og:description" content="Implement pow(x, n). eg. 2^2 = 2^1 * 2^1 = (2^0 * 2^0 * 2) * (2^0 * 2^0 * 2) = (1 * 1 * 2) * (1 * 1 * 2) = 4 eg. 2^3 = 2^1 * 2^1 * 2 = (2^0 * 2^0 * 2) * (2^0 * 2^0 * 2) * 2 = (1 * 1 * 2) * (1 * 1 * 2)">
 <meta property="og:locale" content="en">
 <meta property="og:image" content="https://sanwanliu.github.io/images/og_image.png">
-<meta property="og:updated_time" content="2019-09-17T08:20:15.891Z">
+<meta property="og:updated_time" content="2019-09-17T11:42:49.315Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="21.递归和分治:leetcode-50">
 <meta name="twitter:description" content="Implement pow(x, n). eg. 2^2 = 2^1 * 2^1 = (2^0 * 2^0 * 2) * (2^0 * 2^0 * 2) = (1 * 1 * 2) * (1 * 1 * 2) = 4 eg. 2^3 = 2^1 * 2^1 * 2 = (2^0 * 2^0 * 2) * (2^0 * 2^0 * 2) * 2 = (1 * 1 * 2) * (1 * 1 * 2)">
@@ -155,7 +155,7 @@
                 </time>
                 
                 <i class="far fa-calendar-check"></i>&nbsp;
-                <time class="level-item has-text-grey is-hidden-mobile" datetime="2019-09-17T08:20:15.891Z">
+                <time class="level-item has-text-grey is-hidden-mobile" datetime="2019-09-17T11:42:49.315Z">
                     2019-09-17
                 </time>
                 
@@ -170,7 +170,7 @@
                     <i class="far fa-clock"></i>&nbsp;
                     
                     
-                    a few seconds read (About 103 words)
+                    a minute read (About 129 words)
                 </span>
                 
                 
@@ -188,6 +188,7 @@
 <p>eg. 2^3 = 2^1 * 2^1 * 2 = (2^0 * 2^0 * 2) * (2^0 * 2^0 * 2) * 2 = (1 * 1 * 2) * (1 * 1 * 2) * 2 = 8</p>
 <a id="more"></a>
 
+<p>注意：负数的int的取值范围为-2^31~2^31-1,如果直接使用-n会导致栈溢出</p>
 <h1 id="approach1"><a href="#approach1" class="headerlink" title="approach1"></a>approach1</h1><figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">double</span> <span class="hljs-title">myPow</span><span class="hljs-params">(<span class="hljs-keyword">double</span> x, <span class="hljs-keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="hljs-keyword">return</span> pow(x, n);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">double</span> <span class="hljs-title">pow</span><span class="hljs-params">(<span class="hljs-keyword">double</span> x,<span class="hljs-keyword">long</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="hljs-keyword">if</span> (n == <span class="hljs-number">0</span>) &#123;</span><br><span class="line">            <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="hljs-keyword">if</span> (n &lt; <span class="hljs-number">0</span>) &#123;</span><br><span class="line">            <span class="hljs-keyword">return</span> <span class="hljs-number">1</span> / pow(x, -n);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="hljs-keyword">if</span> (n % <span class="hljs-number">2</span> == <span class="hljs-number">1</span>) &#123;</span><br><span class="line">            <span class="hljs-keyword">return</span> x * pow(x * x, n / <span class="hljs-number">2</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="hljs-keyword">return</span> pow(x * x, n / <span class="hljs-number">2</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>time: O(logn)<br>space: O(logn)</p>
@@ -223,6 +224,13 @@
 
 <div class="card card-transparent">
     <div class="level post-navigation is-flex-wrap is-mobile">
+        
+        <div class="level-start">
+            <a class="level level-item has-link-grey  article-nav-prev" href="/2019/09/17/23-分治：leetcode-169-1/">
+                <i class="level-item fas fa-chevron-left"></i>
+                <span class="level-item">23.分治：leetcode-169</span>
+            </a>
+        </div>
         
         
         <div class="level-end">
@@ -295,7 +303,7 @@
                         Posts
                     </p>
                     <p class="title has-text-weight-normal">
-                        31
+                        36
                     </p>
                 </a>
             </div>
@@ -305,7 +313,7 @@
                         Categories
                     </p>
                     <p class="title has-text-weight-normal">
-                        4
+                        5
                     </p>
                 </a>
             </div>
@@ -315,7 +323,7 @@
                         Tags
                     </p>
                     <p class="title has-text-weight-normal">
-                        14
+                        15
                     </p>
                 </a>
             </div>
