@@ -10,18 +10,18 @@
 <title>Java底层:GC - Blog</title>
 
 
-    <meta name="description" content="标记算法引用计数算法 通过判断对象的引用数量来决定对象是否可以被回收 每个对象实例都有一个引用计数器,被引用则+1,完成引用则-1 任何引用计数为0的对象实例可以被当做垃圾收集  优点: 执行效率高,程序执行受影响较小 缺点: 无法检测出循环引用的情况,导致内存泄露">
+    <meta name="description" content="标记算法引用计数算法（不适合循环引用） 通过判断对象的引用数量来决定对象是否可以被回收 每个对象实例都有一个引用计数器,被引用则+1,完成引用则-1 任何引用计数为0的对象实例可以被当做垃圾收集  优点: 执行效率高,程序执行受影响较小 缺点: 无法检测出循环引用的情况,导致内存泄露">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Java底层:GC">
 <meta property="og:url" content="https://sanwanliu.github.io/2019/07/24/Java底层-gc/index.html">
 <meta property="og:site_name" content="Blog">
-<meta property="og:description" content="标记算法引用计数算法 通过判断对象的引用数量来决定对象是否可以被回收 每个对象实例都有一个引用计数器,被引用则+1,完成引用则-1 任何引用计数为0的对象实例可以被当做垃圾收集  优点: 执行效率高,程序执行受影响较小 缺点: 无法检测出循环引用的情况,导致内存泄露">
+<meta property="og:description" content="标记算法引用计数算法（不适合循环引用） 通过判断对象的引用数量来决定对象是否可以被回收 每个对象实例都有一个引用计数器,被引用则+1,完成引用则-1 任何引用计数为0的对象实例可以被当做垃圾收集  优点: 执行效率高,程序执行受影响较小 缺点: 无法检测出循环引用的情况,导致内存泄露">
 <meta property="og:locale" content="en">
 <meta property="og:image" content="https://sanwanliu.github.io/images/og_image.png">
-<meta property="og:updated_time" content="2019-09-14T18:13:01.000Z">
+<meta property="og:updated_time" content="2019-09-22T13:36:36.737Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java底层:GC">
-<meta name="twitter:description" content="标记算法引用计数算法 通过判断对象的引用数量来决定对象是否可以被回收 每个对象实例都有一个引用计数器,被引用则+1,完成引用则-1 任何引用计数为0的对象实例可以被当做垃圾收集  优点: 执行效率高,程序执行受影响较小 缺点: 无法检测出循环引用的情况,导致内存泄露">
+<meta name="twitter:description" content="标记算法引用计数算法（不适合循环引用） 通过判断对象的引用数量来决定对象是否可以被回收 每个对象实例都有一个引用计数器,被引用则+1,完成引用则-1 任何引用计数为0的对象实例可以被当做垃圾收集  优点: 执行效率高,程序执行受影响较小 缺点: 无法检测出循环引用的情况,导致内存泄露">
 <meta name="twitter:image" content="https://sanwanliu.github.io/images/og_image.png">
 
 
@@ -155,8 +155,8 @@
                 </time>
                 
                 <i class="far fa-calendar-check"></i>&nbsp;
-                <time class="level-item has-text-grey is-hidden-mobile" datetime="2019-09-14T18:13:01.000Z">
-                    2019-09-15
+                <time class="level-item has-text-grey is-hidden-mobile" datetime="2019-09-22T13:36:36.737Z">
+                    2019-09-22
                 </time>
                 
                 
@@ -170,7 +170,7 @@
                     <i class="far fa-clock"></i>&nbsp;
                     
                     
-                    8 minutes read (About 1225 words)
+                    9 minutes read (About 1404 words)
                 </span>
                 
                 
@@ -183,7 +183,7 @@
         </div>
         
         <div class="content">
-            <h1 id="标记算法"><a href="#标记算法" class="headerlink" title="标记算法"></a>标记算法</h1><h2 id="引用计数算法"><a href="#引用计数算法" class="headerlink" title="引用计数算法"></a>引用计数算法</h2><ol>
+            <h1 id="标记算法"><a href="#标记算法" class="headerlink" title="标记算法"></a>标记算法</h1><h2 id="引用计数算法（不适合循环引用）"><a href="#引用计数算法（不适合循环引用）" class="headerlink" title="引用计数算法（不适合循环引用）"></a>引用计数算法（不适合循环引用）</h2><ol>
 <li>通过判断对象的引用数量来决定对象是否可以被回收</li>
 <li>每个对象实例都有一个引用计数器,被引用则+1,完成引用则-1</li>
 <li>任何引用计数为0的对象实例可以被当做垃圾收集</li>
@@ -197,21 +197,24 @@
 <p><img src="http://img.usopp.online/markdown-img-paste-20190724162143362.png" alt></p>
 <p>可以作为GCRoot的对象</p>
 <p><img src="http://img.usopp.online/markdown-img-paste-20190724162534174.png" alt></p>
-<h1 id="垃圾回收算法"><a href="#垃圾回收算法" class="headerlink" title="垃圾回收算法"></a>垃圾回收算法</h1><h2 id="标记-清除算法"><a href="#标记-清除算法" class="headerlink" title="标记-清除算法"></a>标记-清除算法</h2><ul>
+<h1 id="垃圾回收算法"><a href="#垃圾回收算法" class="headerlink" title="垃圾回收算法"></a>垃圾回收算法</h1><h2 id="标记-清除算法（碎片化）"><a href="#标记-清除算法（碎片化）" class="headerlink" title="标记-清除算法（碎片化）"></a>标记-清除算法（碎片化）</h2><ul>
 <li>标记:从根集合进行扫描,对存货的对象进行标记</li>
 <li>清除:对堆内存从头到尾进行线性遍历,回收不可达对象</li>
 </ul>
 <p><img src="http://img.usopp.online/markdown-img-paste-20190724162850813.png" alt></p>
-<p>缺点:碎片化</p>
-<h2 id="复制算法"><a href="#复制算法" class="headerlink" title="复制算法"></a>复制算法</h2><p><img src="http://img.usopp.online/markdown-img-paste-20190724163138991.png" alt></p>
+<p>缺点:不需要进行对象的移动，碎片化严重。如果下一次需要新建一个大的对象，位置不够</p>
+<h2 id="复制算法（年轻代）"><a href="#复制算法（年轻代）" class="headerlink" title="复制算法（年轻代）"></a>复制算法（年轻代）</h2><ul>
+<li>分为对象面和空闲面</li>
+<li>对象在对象面上创建，存活对象从对象面复制到空闲面，再将对象面的所有对象清除</li>
+</ul>
 <p><img src="http://img.usopp.online/markdown-img-paste-20190724163214805.png" alt></p>
 <ul>
 <li>解决了碎片化问题</li>
 <li>顺序分配内存,简单高效</li>
 <li>适用于对象存活率低的场景</li>
-<li>适用于年轻代(存活率低)</li>
+<li>适用于年轻代(存活对象少)</li>
 </ul>
-<h2 id="标记-整理算法"><a href="#标记-整理算法" class="headerlink" title="标记-整理算法"></a>标记-整理算法</h2><ul>
+<h2 id="标记-整理算法（老年代）"><a href="#标记-整理算法（老年代）" class="headerlink" title="标记-整理算法（老年代）"></a>标记-整理算法（老年代）</h2><ul>
 <li>标记:从根集合进行扫描,对存货的对象进行标记</li>
 <li>清除:移动所有存活的对象,且按照内存地址依次排列,然后将末端内存地址以后的内存全部回收</li>
 </ul>
@@ -237,17 +240,14 @@
 </ul>
 <p>与老年代相关,一般老年代的回收伴随着年轻代的回收,因此称为FullGC</p>
 <h4 id="年轻代-尽可能快速地收集掉那些生命周期短的对象"><a href="#年轻代-尽可能快速地收集掉那些生命周期短的对象" class="headerlink" title="年轻代:尽可能快速地收集掉那些生命周期短的对象"></a>年轻代:尽可能快速地收集掉那些生命周期短的对象</h4><ul>
-<li>Eden区</li>
-<li>两个Survivor区</li>
+<li>Eden区（伊甸园）</li>
+<li>两个Survivor区（from&amp;to）<br>8：1：1<br><img src="http://img.usopp.online/markdown-img-paste-20190724165706843.png" alt></li>
 </ul>
-<p><img src="http://img.usopp.online/markdown-img-paste-20190724165706843.png" alt></p>
 <p>年轻代垃圾回收过程:</p>
-<p><img src="http://img.usopp.online/markdown-img-paste-20190724165922151.png" alt></p>
-<p><img src="http://img.usopp.online/markdown-img-paste-20190724165942438.png" alt></p>
-<p><img src="http://img.usopp.online/markdown-img-paste-20190724170004622.png" alt></p>
-<p><img src="http://img.usopp.online/markdown-img-paste-2019072417003479.png" alt></p>
-<p><img src="http://img.usopp.online/markdown-img-paste-20190724170058687.png" alt></p>
-<p><img src="http://img.usopp.online/markdown-img-paste-20190724170134661.png" alt></p>
+<p><img src="http://img.usopp.online/markdown-img-paste-20190724165922151.png" alt><br>eden满了，触发mirror-gc，将存活对象复制到survivor</p>
+<p><img src="http://img.usopp.online/markdown-img-paste-20190724165942438.png" alt><br>清理eden区</p>
+<p><img src="http://img.usopp.online/markdown-img-paste-2019072417003479.png" alt><br>eden再次满了，将eden和s0中的对象拷贝到s1，年龄加1，清理eden和s0</p>
+<p><img src="http://img.usopp.online/markdown-img-paste-20190724170134661.png" alt><br>eden再次满了，将eden和s1中的对象拷贝到s0，年龄加1，清理eden和s1</p>
 <p>当对象的年龄超过一定岁数,变为老年代,可通过参数调节</p>
 <h4 id="对象如何晋升到老年代"><a href="#对象如何晋升到老年代" class="headerlink" title="对象如何晋升到老年代"></a>对象如何晋升到老年代</h4><ul>
 <li>经历一定Minor次数仍然存活</li>
@@ -255,21 +255,22 @@
 <li>新生成的大对象(-XX:+PretenuerSizeThreshold)</li>
 </ul>
 <h4 id="常用调优参数"><a href="#常用调优参数" class="headerlink" title="常用调优参数"></a>常用调优参数</h4><p><img src="http://img.usopp.online/markdown-img-paste-2019072417084410.png" alt></p>
-<h4 id="老年代-存放生命周期较长的对象"><a href="#老年代-存放生命周期较长的对象" class="headerlink" title="老年代:存放生命周期较长的对象"></a>老年代:存放生命周期较长的对象</h4><ul>
+<h4 id="老年代-存放生命周期较长的对象"><a href="#老年代-存放生命周期较长的对象" class="headerlink" title="老年代:存放生命周期较长的对象"></a>老年代:存放生命周期较长的对象</h4><p>大概比例1：2</p>
+<ul>
 <li>FullGC和MajorGC</li>
-<li>FullGC比MinorGC慢,但执行频率低</li>
+<li>FullGC比MinorGC慢（10倍）,但执行频率低</li>
 </ul>
 <p>触发fullGC方条件:</p>
 <ul>
 <li><p>老年代空间不足</p>
 </li>
-<li><p>JDK7之前:永久代空间不足(这也是用元空间替代永久代的原因,降低fullGC的频率)</p>
+<li><p>MinorGC晋升到老年代的平均大小大于老年代的剩余空间</p>
+</li>
+<li><p>永久代空间不足(JDK7之前，这也是用元空间替代永久代的原因,降低fullGC的频率)</p>
 </li>
 <li><p>调用System.gc()(这个方法不一定执行)</p>
 </li>
 <li><p>CMS GC时出现promotion failed,concurrent mode failure</p>
-</li>
-<li><p>MinorGC晋升到老年代的平均大小大于老年代的剩余空间</p>
 </li>
 <li><p>使用RMI来进行RPC或者管理的JDK应用,每小时执行一次FullGC</p>
 </li>
@@ -420,7 +421,7 @@
                         Posts
                     </p>
                     <p class="title has-text-weight-normal">
-                        40
+                        41
                     </p>
                 </a>
             </div>
@@ -467,9 +468,9 @@
         <span class="has-mr-6">1</span>
         <span>标记算法</span>
         </a><ul class="menu-list"><li>
-        <a class="is-flex" href="#引用计数算法">
+        <a class="is-flex" href="#引用计数算法（不适合循环引用）">
         <span class="has-mr-6">1.1</span>
-        <span>引用计数算法</span>
+        <span>引用计数算法（不适合循环引用）</span>
         </a></li><li>
         <a class="is-flex" href="#可达性分析算法">
         <span class="has-mr-6">1.2</span>
@@ -479,17 +480,17 @@
         <span class="has-mr-6">2</span>
         <span>垃圾回收算法</span>
         </a><ul class="menu-list"><li>
-        <a class="is-flex" href="#标记-清除算法">
+        <a class="is-flex" href="#标记-清除算法（碎片化）">
         <span class="has-mr-6">2.1</span>
-        <span>标记-清除算法</span>
+        <span>标记-清除算法（碎片化）</span>
         </a></li><li>
-        <a class="is-flex" href="#复制算法">
+        <a class="is-flex" href="#复制算法（年轻代）">
         <span class="has-mr-6">2.2</span>
-        <span>复制算法</span>
+        <span>复制算法（年轻代）</span>
         </a></li><li>
-        <a class="is-flex" href="#标记-整理算法">
+        <a class="is-flex" href="#标记-整理算法（老年代）">
         <span class="has-mr-6">2.3</span>
-        <span>标记-整理算法</span>
+        <span>标记-整理算法（老年代）</span>
         </a></li><li>
         <a class="is-flex" href="#分代收集算法">
         <span class="has-mr-6">2.4</span>
