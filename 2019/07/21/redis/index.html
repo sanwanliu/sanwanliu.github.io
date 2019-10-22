@@ -19,7 +19,7 @@
 <meta property="og:description" content="为什么redis能这么快100000+qps  完全基于内存,绝大部分请求是纯粹的内存操作 数据结构简单,键值对,查找的时间复杂度是O(1) 采用单线程,单线程也能处理高并发请求,想多核也可启动多实例(单线程只是处理网络请求的时候是单线程) 使用多路I/O复用模型,非阻塞IO">
 <meta property="og:locale" content="en">
 <meta property="og:image" content="https://sanwanliu.github.io/images/og_image.png">
-<meta property="og:updated_time" content="2019-09-14T18:13:01.000Z">
+<meta property="og:updated_time" content="2019-09-26T16:55:16.380Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="redis">
 <meta name="twitter:description" content="为什么redis能这么快100000+qps  完全基于内存,绝大部分请求是纯粹的内存操作 数据结构简单,键值对,查找的时间复杂度是O(1) 采用单线程,单线程也能处理高并发请求,想多核也可启动多实例(单线程只是处理网络请求的时候是单线程) 使用多路I/O复用模型,非阻塞IO">
@@ -156,8 +156,8 @@
                 </time>
                 
                 <i class="far fa-calendar-check"></i>&nbsp;
-                <time class="level-item has-text-grey is-hidden-mobile" datetime="2019-09-14T18:13:01.000Z">
-                    2019-09-15
+                <time class="level-item has-text-grey is-hidden-mobile" datetime="2019-09-26T16:55:16.380Z">
+                    2019-09-27
                 </time>
                 
                 
@@ -166,7 +166,7 @@
                     <i class="far fa-clock"></i>&nbsp;
                     
                     
-                    8 minutes read (About 1213 words)
+                    8 minutes read (About 1240 words)
                 </span>
                 
                 
@@ -204,7 +204,9 @@
 <li>问清数据规模</li>
 </ul>
 <h2 id="使用keys对线上业务的影响"><a href="#使用keys对线上业务的影响" class="headerlink" title="使用keys对线上业务的影响"></a>使用keys对线上业务的影响</h2><p>keys指令一次性返回所有匹配的key,key的数量过大会使服务卡顿</p>
-<h2 id="使用scan指令-无阻塞"><a href="#使用scan指令-无阻塞" class="headerlink" title="使用scan指令:无阻塞"></a>使用scan指令:无阻塞</h2><p><img src="http://img.usopp.online/markdown-img-paste-20190723085839642.png" alt></p>
+<h2 id="使用scan指令-无阻塞"><a href="#使用scan指令-无阻塞" class="headerlink" title="使用scan指令:无阻塞"></a>使用scan指令:无阻塞</h2><p>scan 0 k1* count 10(返回 游标1232 和匹配的元素)<br>scan 1232 k1* count 10</p>
+<p>java可以将结果放入set去重</p>
+<p><img src="http://img.usopp.online/markdown-img-paste-20190723085839642.png" alt></p>
 <h1 id="如何通过redis实现分布式锁"><a href="#如何通过redis实现分布式锁" class="headerlink" title="如何通过redis实现分布式锁"></a>如何通过redis实现分布式锁</h1><h2 id="分布式锁需要解决的问题"><a href="#分布式锁需要解决的问题" class="headerlink" title="分布式锁需要解决的问题"></a>分布式锁需要解决的问题</h2><ul>
 <li>互斥性:只能由一个客户端获取到锁</li>
 <li>安全性:只能由获取锁的客户端删除锁</li>
@@ -382,7 +384,7 @@
                         Posts
                     </p>
                     <p class="title has-text-weight-normal">
-                        41
+                        43
                     </p>
                 </a>
             </div>

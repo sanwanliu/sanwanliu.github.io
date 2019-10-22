@@ -18,7 +18,7 @@
 <meta property="og:description" content="数据库架构如何设计一个关系型数据库首先将其划分为存储部分和对存储进行逻辑管理的程序实例，存储部分类似一个文件系统，程序实例将包含数据逻辑关系转为物理存储关系的存储管理模块，优化存储效率的缓存模块，将sql语句进行解析的sql解析模块，记录操作的日志管理模块，进行多用户管理的权限划分模块，容灾模块，优化数据查询的索引模块，使数据库支持并发的锁模块。">
 <meta property="og:locale" content="en">
 <meta property="og:image" content="https://sanwanliu.github.io/images/og_image.png">
-<meta property="og:updated_time" content="2019-09-14T18:13:01.000Z">
+<meta property="og:updated_time" content="2019-09-26T16:55:16.380Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="数据库">
 <meta name="twitter:description" content="数据库架构如何设计一个关系型数据库首先将其划分为存储部分和对存储进行逻辑管理的程序实例，存储部分类似一个文件系统，程序实例将包含数据逻辑关系转为物理存储关系的存储管理模块，优化存储效率的缓存模块，将sql语句进行解析的sql解析模块，记录操作的日志管理模块，进行多用户管理的权限划分模块，容灾模块，优化数据查询的索引模块，使数据库支持并发的锁模块。">
@@ -155,8 +155,8 @@
                 </time>
                 
                 <i class="far fa-calendar-check"></i>&nbsp;
-                <time class="level-item has-text-grey is-hidden-mobile" datetime="2019-09-14T18:13:01.000Z">
-                    2019-09-15
+                <time class="level-item has-text-grey is-hidden-mobile" datetime="2019-09-26T16:55:16.380Z">
+                    2019-09-27
                 </time>
                 
                 
@@ -170,7 +170,7 @@
                     <i class="far fa-clock"></i>&nbsp;
                     
                     
-                    18 minutes read (About 2761 words)
+                    19 minutes read (About 2795 words)
                 </span>
                 
                 
@@ -248,14 +248,14 @@
 </ul>
 <h1 id="锁"><a href="#锁" class="headerlink" title="锁"></a>锁</h1><h2 id="MyISAM和InnoDB的锁的区别是什么"><a href="#MyISAM和InnoDB的锁的区别是什么" class="headerlink" title="MyISAM和InnoDB的锁的区别是什么"></a>MyISAM和InnoDB的锁的区别是什么</h2><p><img src="http://img.usopp.online/markdown-img-paste-20190714175057287.png" alt></p>
 <p>myisam：</p>
-<p>读写、写读-myisam在进行查询的时候，会加一个表级别的读锁；在进行增删改的时候会加一个表级别的行锁。在读锁未被释放，加写锁时会被阻塞，直到读锁被释放为止。</p>
+<p>读写、写读-myisam在进行查询的时候，会加一个表级别的读锁；在进行增删改的时候会加一个表级别的写锁。在读锁未被释放，加写锁时会被阻塞，直到读锁被释放为止。</p>
 <p>读读-可以同时进行，读锁又叫共享锁。（上排他锁，for update）</p>
 <p>写写-不能同时写，写锁又叫排他锁</p>
 <p>innodb：</p>
 <p>二段锁：加锁解锁两个步骤，先对同一个事务里的一批操作做加锁，commit的时候再进行解锁</p>
 <figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">set autocommit=0；// 支持事务，需要关闭事务自动提交</span><br><span class="line">先读后写</span><br><span class="line">session1：select * from person_info where id=1;</span><br><span class="line">session12: update  person_info set title =&quot;test&quot; where id=1;//本来应该阻塞，竟然成功</span><br><span class="line">//实际innodb对select做了改进，并未上读锁</span><br></pre></td></tr></table></figure>
 
-<p>表级锁和索引无关，行级锁和索引有关</p>
+<p>表级锁和索引无关，行级锁和索引有关，当不走索引，表会被锁住</p>
 <p>锁的力度越细，代价越高。表级锁只要在表的头部上锁，行级锁需要扫描到某行后对其加锁，开销更大</p>
 <ul>
 <li><p>MyISAM默认用的是表级锁，不支持行级锁</p>
@@ -265,18 +265,20 @@
 </ul>
 <h2 id="MyISAM适合的场景"><a href="#MyISAM适合的场景" class="headerlink" title="MyISAM适合的场景"></a>MyISAM适合的场景</h2><ul>
 <li>频繁执行全表count语句</li>
-<li>对数据的增删改的频率不高 shiwu，查询频繁</li>
+<li>对数据的增删改的频率不高，查询频繁</li>
 <li>没有事务</li>
 </ul>
 <h2 id="InnoDB适合的场景"><a href="#InnoDB适合的场景" class="headerlink" title="InnoDB适合的场景"></a>InnoDB适合的场景</h2><ul>
 <li>增删改查频繁</li>
 <li>需要事务</li>
 </ul>
-<h2 id="数据库锁的分类"><a href="#数据库锁的分类" class="headerlink" title="数据库锁的分类"></a>数据库锁的分类</h2><p><img src="http://img.usopp.online/markdown-img-paste-2019071518124027.png" alt>、</p>
+<h2 id="数据库锁的分类"><a href="#数据库锁的分类" class="headerlink" title="数据库锁的分类"></a>数据库锁的分类</h2><p><img src="http://img.usopp.online/markdown-img-paste-2019071518124027.png" alt></p>
+<p>自动锁包括myasm表锁，select for update，lock in share mode;//显示锁</p>
+<p>dml锁增删改，ddl锁alter</p>
 <ul>
-<li><p>悲观锁：对数据被外界修改持保守态度，在数据处理过程将数据锁定，依靠数据库提供的锁机制实现。缺点：增加开销，降低并行性</p>
+<li><p>悲观锁：操作数据会发生并发冲突，在数据处理过程将数据锁定，依靠数据库提供的锁机制实现。缺点：增加开销，降低并行性</p>
 </li>
-<li><p>乐观锁：认为数据一般情况下不会冲突，到数据提交更新时才检查是否冲突，通过版本号和时间戳实现</p>
+<li><p>乐观锁：认为不会发生并发冲突，到数据提交更新时才检查是否冲突，通过版本号和时间戳实现</p>
 </li>
 </ul>
 <p>有一条比较好的建议，可以减小乐观锁力度，最大程度的提升吞吐率，提高并发能力！如下：</p>
@@ -366,16 +368,16 @@
     <div class="level post-navigation is-flex-wrap is-mobile">
         
         <div class="level-start">
-            <a class="level level-item has-link-grey  article-nav-prev" href="/2019/07/19/18-验证二叉搜索树:leetcode-98/">
+            <a class="level level-item has-link-grey  article-nav-prev" href="/2019/07/19/网络/">
                 <i class="level-item fas fa-chevron-left"></i>
-                <span class="level-item">18.验证二叉搜索树:leetcode-98 Search Tree</span>
+                <span class="level-item">网络</span>
             </a>
         </div>
         
         
         <div class="level-end">
-            <a class="level level-item has-link-grey  article-nav-next" href="/2019/07/19/网络/">
-                <span class="level-item">网络</span>
+            <a class="level level-item has-link-grey  article-nav-next" href="/2019/07/19/17-树和图/">
+                <span class="level-item">17.树和图</span>
                 <i class="level-item fas fa-chevron-right"></i>
             </a>
         </div>
@@ -444,7 +446,7 @@
                         Posts
                     </p>
                     <p class="title has-text-weight-normal">
-                        41
+                        43
                     </p>
                 </a>
             </div>
